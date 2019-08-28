@@ -74,7 +74,7 @@ void driverSWDCDCSetEnablePin(bool desiredEnableState) {
 
 float driverSWDCDCGetAuxVoltage(void) {
 	float auxVoltage = 0.0f;
-	driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,&auxVoltage,0.004f);
+	driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,&auxVoltage,1.0f);
 	return auxVoltage;
 };
 

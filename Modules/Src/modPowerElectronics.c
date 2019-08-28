@@ -129,7 +129,7 @@ void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, mod
 	
 	// Sample the first pack voltage moment
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL)
-		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,0.004f);
+		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 	
 	// Register terminal commands
 	modTerminalRegisterCommandCallBack("testbms","Test the cell connection between cell monitor and pack and pack vs cell measurement.","[error (V)] [bal drop (mV)]",modPowerElectronicsTerminalCellConnectionTest);
@@ -1254,21 +1254,21 @@ void modPowerElectrinicsSamplePackVoltage(float *voltagePointer) {
 			break;
 		case sourcePackVoltageISL28022_2_0X40_LVBatteryIn:
 			if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,0.004f);
+				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 11.22f;
 			}
 			break;
 		case sourcePackVoltageISL28022_1_0X44_LVLoadOutput:
 			if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMainISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,voltagePointer,0.004f);
+				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 22.11f;
 			}
 			break;
 		case sourcePackVoltageISL28022_1_0X45_DCDC:
 			if(modPowerElectronicsPackStateHandle->hiAmpShieldPresent) {
-				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,voltagePointer,0.004f);
+				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 0.0f;
 			}

@@ -49,7 +49,8 @@
 #define BOOTLOADER_RX_GPIO_Port GPIOA
 #define LTC6803_CS_Pin GPIO_PIN_4
 #define LTC6803_CS_GPIO_Port GPIOA
-#define LTC6804_CS_Pin GPIO_PIN_8
+//#define LTC6804_CS_Pin GPIO_PIN_8
+#define LTC6804_CS_Pin GPIO_PIN_4 // For ENNOID hardware only otherwise PIN_8
 #define LTC6804_CS_GPIO_Port GPIOA
 #define LTC_SCK_Pin GPIO_PIN_5
 #define LTC_SCK_GPIO_Port GPIOA

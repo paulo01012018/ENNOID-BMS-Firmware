@@ -40,7 +40,9 @@ typedef struct {
 	float    shuntLCFactor;                                                       // Shunt multiplication factor Low current
 	int16_t  shuntLCOffset;                                                       // Shunt low current offset
 	float    shuntHCFactor;                                                       // Shunt multiplication factor High current	
-  int16_t  shuntHCOffset;                                                       // Shunt high current offset	
+	int16_t  shuntHCOffset;                                                       // Shunt high current offset	
+	float    voltageLCFactor;                                                     // Voltage multiplication factor Low current
+	int16_t  voltageLCOffset;                                                     // Voltage low current offset
 	uint8_t  throttleChargeIncreaseRate;																					// The rate of charge throttle percentage increase per 100ms
 	uint8_t  throttleDisChargeIncreaseRate;                                       // The rate of discharge throttle percentage instrease per 100ms
 	uint32_t cellBalanceUpdateInterval;																						// Amount of time that the balance resistor enable mask is kept

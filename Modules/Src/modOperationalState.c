@@ -121,7 +121,7 @@ void modOperationalStateTask(void) {
 			break;
 		case OP_STATE_LOAD_ENABLED:
 			if(modPowerElectronicsSetDisCharge(true)) {
-				modPowerElectronicsSetPreCharge(false);
+				modPowerElectronicsSetPreCharge(true); // For ENNOID hardware only, otherwise false
 			  modPowerElectronicsSetCharge(modOperationalStateGeneralConfigHandle->allowChargingDuringDischarge);
 			}else{
 				modOperationalStateSetNewState(OP_STATE_PRE_CHARGE);

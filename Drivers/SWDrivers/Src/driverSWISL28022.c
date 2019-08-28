@@ -43,6 +43,7 @@ bool driverSWISL28022GetBusVoltage(uint8_t i2cAddres, uint8_t i2cBus, float *bus
 	uint8_t readDataV[2];
 	uint8_t commSucces = HAL_OK;
 	uint16_t busVoltageInt;
+	float step = 0.004f;
 	
 	if(i2cBus == 1){
 	  commSucces |= driverHWI2C1Write(i2cAddres,false,writeDataV,1);
@@ -54,7 +55,7 @@ bool driverSWISL28022GetBusVoltage(uint8_t i2cAddres, uint8_t i2cBus, float *bus
 
 	if(commSucces == HAL_OK) {
 		busVoltageInt = (readDataV[0] << 6) | (readDataV[1] >> 2);
-		*busVoltage = scalar*busVoltageInt;	
+		*busVoltage = step*scalar*busVoltageInt;	
   }else{
 		*busVoltage = 0.0f;
   }		
