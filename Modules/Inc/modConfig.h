@@ -15,6 +15,7 @@
 #define modConfigNTCGroupMasterPCB 3
 #define modConfigNTCGroupHiAmpAUX  4
 
+
 typedef struct {
 	// Master BMS
 	uint8_t  noOfCellsSeries;																											// Number of cell groups in series in pack

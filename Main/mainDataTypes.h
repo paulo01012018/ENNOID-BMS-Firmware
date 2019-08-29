@@ -663,4 +663,10 @@ typedef struct {
 	float    humidity;
 } cellMonitorModuleTypeDef;
 
+typedef enum {
+	disabled = 0,
+	enabled,
+	persistent
+} switchState;
+
 #endif /* DATATYPES_H_ */

@@ -111,7 +111,7 @@ void modOperationalStateTask(void) {
 					modOperationalStateSetNewState(OP_STATE_LOAD_ENABLED);					// Goto normal load enabled operation
 				}
 			}else if(modDelayTick1ms(&modOperationalStatePreChargeTimeout,modOperationalStateGeneralConfigHandle->timeoutLCPreCharge)){
-				if(modOperationalStateGeneralConfigHandle->LCUsePrecharge)
+				if(modOperationalStateGeneralConfigHandle->LCUsePrecharge>=1)
 				  modOperationalStateSetNewState(OP_STATE_ERROR_PRECHARGE);				// An error occured during pre charge
 				else
 					modOperationalStateSetNewState(OP_STATE_LOAD_ENABLED);					// Goto normal load enabled operation
@@ -121,7 +121,11 @@ void modOperationalStateTask(void) {
 			break;
 		case OP_STATE_LOAD_ENABLED:
 			if(modPowerElectronicsSetDisCharge(true)) {
-				modPowerElectronicsSetPreCharge(true); // For ENNOID hardware only, otherwise false
+				if(modOperationalStateGeneralConfigHandle->LCUsePrecharge==persistent){
+					modPowerElectronicsSetPreCharge(true);
+				}else{
+					modPowerElectronicsSetPreCharge(false);
+				}
 			  modPowerElectronicsSetCharge(modOperationalStateGeneralConfigHandle->allowChargingDuringDischarge);
 			}else{
 				modOperationalStateSetNewState(OP_STATE_PRE_CHARGE);

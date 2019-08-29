@@ -255,7 +255,7 @@ bool modPowerElectronicsSetDisCharge(bool newState) {
 		dischargeLastState = newState;
 	}
 	
-	if((modPowerElectronicsPackStateHandle->loCurrentLoadVoltage < PRECHARGE_PERCENTAGE*(modPowerElectronicsPackStateHandle->packVoltage)) && modPowerElectronicsGeneralConfigHandle->LCUsePrecharge) // Prevent turn on with to low output voltage
+	if((modPowerElectronicsPackStateHandle->loCurrentLoadVoltage < PRECHARGE_PERCENTAGE*(modPowerElectronicsPackStateHandle->packVoltage)) && modPowerElectronicsGeneralConfigHandle->LCUsePrecharge>=1) // Prevent turn on with to low output voltage
 		return false;																																			                                                  // Load voltage to low (output not precharged enough) return whether or not precharge is needed.
 	else
 		return true;
