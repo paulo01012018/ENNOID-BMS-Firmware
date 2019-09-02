@@ -131,6 +131,7 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			ind = 0;
 		  modCommandsGeneralConfig->noOfCellsSeries                = libBufferGet_uint8(data,&ind);                  // 1
 		  modCommandsGeneralConfig->noOfCellsParallel              = libBufferGet_uint8(data,&ind);		               // 1
+			modCommandsGeneralConfig->noOfParallelModules          	 = libBufferGet_uint8(data,&ind);		               // 1
 			modCommandsGeneralConfig->batteryCapacity                = libBufferGet_float32_auto(data,&ind);           // 4
 			modCommandsGeneralConfig->cellHardUnderVoltage           = libBufferGet_float32_auto(data,&ind);           // 4
 			modCommandsGeneralConfig->cellHardOverVoltage            = libBufferGet_float32_auto(data,&ind);           // 4
@@ -152,6 +153,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			modCommandsGeneralConfig->shuntLCOffset                  = libBufferGet_int16(data,&ind);                  // 2
 			modCommandsGeneralConfig->shuntHCFactor	                 = libBufferGet_float32_auto(data,&ind);           // 4
 			modCommandsGeneralConfig->shuntHCOffset                  = libBufferGet_int16(data,&ind);                  // 2
+			modCommandsGeneralConfig->voltageLCFactor	               = libBufferGet_float32_auto(data,&ind);           // 4
+			modCommandsGeneralConfig->voltageLCOffset                = libBufferGet_int16(data,&ind);                  // 2
 		  modCommandsGeneralConfig->throttleChargeIncreaseRate     = libBufferGet_uint8(data,&ind);                  // 1
 		  modCommandsGeneralConfig->throttleDisChargeIncreaseRate  = libBufferGet_uint8(data,&ind);                  // 1
 		  modCommandsGeneralConfig->cellBalanceUpdateInterval      = libBufferGet_uint32(data,&ind);                 // 4
@@ -253,6 +256,7 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 		  
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->noOfCellsSeries                 ,&ind); // 1
 			libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->noOfCellsParallel               ,&ind); // 1
+			libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->noOfParallelModules             ,&ind); // 1
 		  libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->batteryCapacity                 ,&ind); // 4
 		  libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->cellHardUnderVoltage            ,&ind); // 4
 		  libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->cellHardOverVoltage             ,&ind); // 4
@@ -274,6 +278,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->shuntLCOffset                   ,&ind); // 2
 			libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->shuntHCFactor                   ,&ind); // 4
 			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->shuntHCOffset                   ,&ind); // 2
+			libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->voltageLCFactor                 ,&ind); // 4
+			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->voltageLCOffset                 ,&ind); // 2
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->throttleChargeIncreaseRate      ,&ind); // 1
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->throttleDisChargeIncreaseRate   ,&ind); // 1
 		  libBufferAppend_uint32(       modCommandsSendBuffer,modCommandsToBeSendConfig->cellBalanceUpdateInterval       ,&ind); // 4

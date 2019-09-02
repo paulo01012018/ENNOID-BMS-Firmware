@@ -18,9 +18,10 @@
 
 typedef struct {
 	// Master BMS
-	uint8_t  noOfCellsSeries;																											// Number of cell groups in series in pack
+	uint8_t  noOfCellsSeries;																											// Total number of cells in series in the battery pack
 	uint8_t  noOfCellsParallel;                                                   // Number of cells in parallel group
-	uint8_t  noOfCellsPerModule;                                                  // Number of cells per module
+	uint8_t  noOfCellsPerModule;                                                  // Number of cell levels monitored per LTC68XX
+	uint8_t  noOfParallelModules;                                                 // Number of parallel modules
 	float    batteryCapacity;																											// Battery capacity in Ah
 	float    cellHardUnderVoltage;																								// If the lowest cell is under this voltage -> Error situation, turn all off and power down
 	float    cellHardOverVoltage;																									// If the upper cell is above this voltage -> Error situation, turn all off and power down

@@ -1231,7 +1231,7 @@ void modPowerElectronicsTerminalCellConnectionTest(int argc, const char **argv) 
 void modPowerElectronicsSamplePackAndLCData(void) {
 	float tempPackVoltage;
 	
-	modPowerElectrinicsSamplePackVoltage(&tempPackVoltage);
+	modPowerElectronicsSamplePackVoltage(&tempPackVoltage);
 	
 	if(fabs(tempPackVoltage - modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsPackStateHandle->cellVoltageAverage) < 2.0f) {    // If the error is smaller than one volt continue normal operation. 
 		modPowerElectronicsPackStateHandle->packVoltage = tempPackVoltage;
@@ -1248,7 +1248,7 @@ void modPowerElectronicsSamplePackAndLCData(void) {
 	}
 }
 
-void modPowerElectrinicsSamplePackVoltage(float *voltagePointer) {
+void modPowerElectronicsSamplePackVoltage(float *voltagePointer) {
 	switch(modPowerElectronicsGeneralConfigHandle->packVoltageDataSource) {
 		case sourcePackVoltageNone:
 			break;

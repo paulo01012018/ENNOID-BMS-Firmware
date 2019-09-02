@@ -55,9 +55,10 @@ void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLoc
 
 void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocation) {
 	#ifdef ENNOID
-	configLocation->noOfCellsSeries														     = 12;											// X Cells in series
-	configLocation->noOfCellsParallel                              = 10;                      // For the efoil battery this will always be this
-	configLocation->noOfCellsPerModule                             = 12;                       // Number of cells per module
+	configLocation->noOfCellsSeries														     = 12;											// Total number of cells in series in the battery pack
+	configLocation->noOfCellsParallel                              = 10;                      // Number of cells in parallel
+	configLocation->noOfCellsPerModule                             = 12;                      // Number of cell levels monitored per LTC68XX
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 22.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.35f;										// Worst case X.XXV as highest cell voltage
@@ -168,6 +169,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->noOfCellsSeries														     = 12;											// X Cells in series
 	configLocation->noOfCellsParallel                              = 16;                      // For the efoil battery this will always be this
 	configLocation->noOfCellsPerModule                             = 1;                       // Number of cells per module
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 40.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.20f;										// Worst case X.XXV as highest cell voltage
@@ -278,6 +280,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->noOfCellsSeries														     = 35;											// X Cells in series
 	configLocation->noOfCellsParallel                              = 12;                      // For the efoil battery this will always be this
 	configLocation->noOfCellsPerModule                             = 7;                       // Number of cells per module
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 40.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.20f;										// Worst case X.XXV as highest cell voltage
@@ -367,6 +370,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->NTCTopResistor[modConfigNTCGroupHiAmpExt]      = 100000;                  // NTC Pullup resistor value
 	configLocation->NTCTopResistor[modConfigNTCGroupHiAmpPCB]      = 100000;                  // NTC Pullup resistor value
 	configLocation->NTCTopResistor[modConfigNTCGroupHiAmpAUX]      = 100000;                  // NTC Pullup resistor value
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->NTC25DegResistance[modConfigNTCGroupHiAmpExt]  = 100000;                  // NTC resistance at 25 degree
 	configLocation->NTC25DegResistance[modConfigNTCGroupHiAmpPCB]  = 100000;                  // NTC resistance at 25 degree
 	configLocation->NTC25DegResistance[modConfigNTCGroupHiAmpAUX]  = 100000;                  // NTC resistance at 25 degree	
@@ -388,6 +392,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->noOfCellsSeries														     = 12;											// X Cells in series
 	configLocation->noOfCellsParallel                              = 16;                      // For the efoil battery this will always be this
 	configLocation->noOfCellsPerModule                             = 1;                       // Number of cells per module
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 40.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.20f;										// Worst case X.XXV as highest cell voltage
@@ -498,6 +503,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->noOfCellsSeries														     = 12;											// X Cells in series
 	configLocation->noOfCellsParallel                              = 16;                      // For the efoil battery this will always be this
 	configLocation->noOfCellsPerModule                             = 1;                       // Number of cells per module
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 40.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.25f;										// Worst case X.XXV as highest cell voltage
@@ -608,6 +614,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->noOfCellsSeries														     = 12;											// X Cells in series
 	configLocation->noOfCellsParallel                              = 4;                       // For the esk8 world this could be many things, set default to 4
 	configLocation->noOfCellsPerModule                             = 1;                       // Number of cells per module
+	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 15.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
 	configLocation->cellHardOverVoltage												     = 4.35f;										// Worst case X.XXV as highest cell voltage

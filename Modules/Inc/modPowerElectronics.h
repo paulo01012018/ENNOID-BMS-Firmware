@@ -177,7 +177,7 @@ float modPowerElectronicsCalcPackCurrent(void);
 void  modPowerElectronicsTerminalCellConnectionTest(int argc, const char **argv);
 void  modPowerElectronicsCheckPackSOA(void);
 void  modPowerElectronicsSamplePackAndLCData(void);
-void  modPowerElectrinicsSamplePackVoltage(float *voltagePointer);
+void  modPowerElectronicsSamplePackVoltage(float *voltagePointer);
 void  modPowerElectronicsLCSenseSample(void);
 void  modPowerElectronicsLCSenseInit(void);
 uint16_t modPowerElectronicsLowestInThree(uint16_t num1,uint16_t num2,uint16_t num3);
