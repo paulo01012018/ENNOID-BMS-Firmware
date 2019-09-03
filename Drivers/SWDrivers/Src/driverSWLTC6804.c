@@ -1,6 +1,6 @@
 #include "driverSWLTC6804.h"
 
-uint8_t driverSWLTC6804TotalNumerOfICs = 0;
+uint8_t driverSWLTC6804TotalNumberOfICs = 0;
 driverLTC6804ConfigStructTypedef driverSWLTC6804ConfigStruct;
 uint32_t voltageLimitReg; 
 
@@ -11,9 +11,9 @@ void driverSWLTC6804DelayMS(uint32_t delayMS) {
 
 void driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t totalNumberOfLTCs) {		
 	driverSWLTC6804ConfigStruct = configStruct;
-	driverSWLTC6804TotalNumerOfICs = totalNumberOfLTCs;
+	driverSWLTC6804TotalNumberOfICs = totalNumberOfLTCs;
 	
-	uint8_t rxConfig [driverSWLTC6804TotalNumerOfICs][8];
+	uint8_t rxConfig [driverSWLTC6804TotalNumberOfICs][8];
 	uint8_t LTCScanCount = 0;
 	int8_t returnPEC = -1;
 	
@@ -21,9 +21,9 @@ void driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t 
 	driverSWLTC6804WakeIC();
 	
 	while((LTCScanCount < 5) && (returnPEC == -1)){
-	  returnPEC =	driverSWLTC6804ReadConfigRegister(driverSWLTC6804TotalNumerOfICs,rxConfig);
+	  returnPEC =	driverSWLTC6804ReadConfigRegister(driverSWLTC6804TotalNumberOfICs,rxConfig);
 		driverSWLTC6804WakeIC();
-		driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumerOfICs,0,false);
+		driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumberOfICs,0,false);
 		driverSWLTC6804WakeIC();
 		LTCScanCount++;
 	}
@@ -161,9 +161,9 @@ bool driverSWLTC6804ReadCellVoltages(cellMonitorCellsTypeDef *cellVoltages) {
 	bool dataValid = true;
 	static uint16_t cellVoltageCodes[1][12]; 
 	
-	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumerOfICs,cellVoltageCodes);
+	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumberOfICs,cellVoltageCodes);
 	
-	if(driverSWLTC6804TotalNumerOfICs == 1) {
+	if(driverSWLTC6804TotalNumberOfICs == 1) {
 		uint8_t cellPointer;
 		for(cellPointer = 0; cellPointer < 12; cellPointer++){
 			if(cellVoltageCodes[0][cellPointer]*0.0001f < 10.0f)
@@ -181,11 +181,11 @@ bool driverSWLTC6804ReadCellVoltages(cellMonitorCellsTypeDef *cellVoltages) {
 
 bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]) {
 	bool dataValid = true;
-	uint16_t cellVoltageArrayCodes[driverSWLTC6804TotalNumerOfICs][12]; 
+	uint16_t cellVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][12]; 
 	
-	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumerOfICs,cellVoltageArrayCodes);
+	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumberOfICs,cellVoltageArrayCodes);
 	
-  for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumerOfICs; modulePointer++) {
+  for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
 		for(uint8_t cellPointer = 0; cellPointer < 12; cellPointer++){
 			if(cellVoltageArrayCodes[modulePointer][cellPointer]*0.0001f < 10.0f)
 			  cellVoltagesArray[modulePointer][cellPointer] = cellVoltageArrayCodes[modulePointer][cellPointer]*0.0001f;
@@ -281,13 +281,13 @@ bool driverSWLTC6804ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *over
 	// Variables
 	uint16_t newVoltageUnder = 0;
 	uint16_t newVoltageOver  = 0;
-	driverSWLTC6804StatusStructTypedef driverSWLTC6804StatusStruct[driverSWLTC6804TotalNumerOfICs];
+	driverSWLTC6804StatusStructTypedef driverSWLTC6804StatusStruct[driverSWLTC6804TotalNumberOfICs];
 	
 	// Get the data from the modules
-	driverSWLTC6804ReadStatusValues(driverSWLTC6804TotalNumerOfICs,driverSWLTC6804StatusStruct);
+	driverSWLTC6804ReadStatusValues(driverSWLTC6804TotalNumberOfICs,driverSWLTC6804StatusStruct);
 	
 	// Combine it
-	for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumerOfICs; modulePointer++) {
+	for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
 		newVoltageUnder |= driverSWLTC6804StatusStruct[modulePointer].underVoltage;
 		newVoltageOver  |= driverSWLTC6804StatusStruct[modulePointer].overVoltage;
 	}
@@ -389,7 +389,7 @@ void driverSWLTC6804ReadStatusGroups(uint8_t reg, uint8_t total_ic, uint8_t *dat
 bool driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]){
 	uint16_t readAuxSensors[1][6];
 	
-	driverSWLTC6804ReadAuxVoltages(0,1,readAuxSensors);
+	driverSWLTC6804ReadAuxVoltageRegisters(0,1,readAuxSensors);
 	
 	tempVoltages[0] = readAuxSensors[0][0]; // Humidity
 	tempVoltages[1] = readAuxSensors[0][1]; // NTC
@@ -398,7 +398,25 @@ bool driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]){
 	return false;
 }
 
-int8_t driverSWLTC6804ReadAuxVoltages(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]) {
+bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6]) {
+	bool dataValid = true;
+	uint16_t auxVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][6]; 
+	
+	driverSWLTC6804ReadAuxVoltageRegisters(AUX_CH_ALL,driverSWLTC6804TotalNumberOfICs,auxVoltageArrayCodes);
+	
+  for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
+		for(uint8_t cellPointer = 0; cellPointer < 12; cellPointer++){
+			if(auxVoltageArrayCodes[modulePointer][cellPointer]*0.0001f < 10.0f)
+			  auxVoltagesArray[modulePointer][cellPointer] = auxVoltageArrayCodes[modulePointer][cellPointer]*0.0001f;
+			else
+				dataValid = false;
+		}
+  }
+	
+	return dataValid;
+}
+
+int8_t driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]) {
   const uint8_t NUM_RX_BYT = 8;
   const uint8_t BYT_IN_REG = 6;
   const uint8_t GPIO_IN_REG = 3;
@@ -465,7 +483,13 @@ void driverSWLTC6804ReadAuxGroups(uint8_t reg, uint8_t total_ic, uint8_t *data) 
   }else if(reg == 2) {		//Read back auxiliary group B 
     cmd[1] = 0x0e;
     cmd[0] = 0x00;
-  }else{					      //Read back auxiliary group A
+  }else if(reg == 3) {		//Read back auxiliary group C LTC6812 & LTC6813 only
+    cmd[1] = 0x0d;
+    cmd[0] = 0x00;
+  }else if(reg == 4) {		//Read back auxiliary group D LTC6812 & LTC6813 only
+    cmd[1] = 0x0f;
+    cmd[0] = 0x00;
+  }else{					     //Read back auxiliary group A
      cmd[1] = 0x0C;		
      cmd[0] = 0x00;
   }
@@ -529,13 +553,13 @@ void driverSWLTC6804WriteConfigRegister(uint8_t totalNumberOfLTCs, uint16_t *bal
 void driverSWLTC6804EnableBalanceResistors(uint16_t enableMask) {
 	driverSWLTC6804ConfigStruct.DisChargeEnableMask = enableMask;
 	
-	if(driverSWLTC6804TotalNumerOfICs == 1) {
-		driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumerOfICs,0,false);
+	if(driverSWLTC6804TotalNumberOfICs == 1) {
+		driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumberOfICs,0,false);
 	}
 }
 
 void driverSWLTC6804EnableBalanceResistorsArray(uint16_t *enableMask) {
-	driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumerOfICs,enableMask,true);
+	driverSWLTC6804WriteConfigRegister(driverSWLTC6804TotalNumberOfICs,enableMask,true);
 }
 
 uint16_t driverSWLTC6804CalcPEC15(uint8_t len, uint8_t *data) {
@@ -618,6 +642,3 @@ float driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNomin
 	
   return steinhart;
 }
-
-
-

@@ -92,7 +92,9 @@ typedef struct {
 	uint8_t  buzzerOn;
 	uint8_t  watchDogTime;
 	cellMonitorCellsTypeDef cellVoltagesIndividual[NoOfCellsPossibleOnBMS];
+	auxMonitorTypeDef auxVoltagesIndividual[6];
 	modPowerElectronicsPackOperationalCellStatesTypedef packOperationalCellState;
+	
 	
 	// Slave BMS
 	uint8_t  hiAmpShieldPresent;
@@ -137,6 +139,7 @@ typedef struct {
 	
 	// Slave modules -> TODO move into struct.
 	float    cellModuleVoltages[NoOfCellMonitorsPossibleOnBMS][12];
+	float    auxModuleVoltages[NoOfCellMonitorsPossibleOnBMS][6];
 	uint16_t cellModuleBalanceResistorEnableMask[NoOfCellMonitorsPossibleOnBMS];
 	
 } modPowerElectronicsPackStateTypedef;
@@ -173,6 +176,7 @@ void  modPowerElectronicsCellMonitorsEnableBalanceResistorsArray(void);
 void  modPowerElectronicsCellMonitorsReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags);
 void  modPowerElectronicsCellMonitorsCheckAndSolveInitState(void);
 void  modPowerElectronicsCellMonitorsArrayTranslate(void);
+void  modPowerElectronicsAuxMonitorsArrayTranslate(void);
 float modPowerElectronicsCalcPackCurrent(void);
 void  modPowerElectronicsTerminalCellConnectionTest(int argc, const char **argv);
 void  modPowerElectronicsCheckPackSOA(void);

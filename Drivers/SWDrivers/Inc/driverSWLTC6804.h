@@ -196,13 +196,19 @@ void     driverSWLTC6804StartCellAndAuxVoltageConversion(uint8_t MD,uint8_t DCP)
 void     driverSWLTC6804StartCellVoltageConversion(uint8_t MD,uint8_t DCP, uint8_t CH);
 void     driverSWLTC6804StartLoadedCellVoltageConversion(uint8_t MD,uint8_t DCP, uint8_t CH,uint8_t PUP);
 void     driverSWLTC6804StartAuxVoltageConversion(uint8_t MD, uint8_t CHG);
+
 bool     driverSWLTC6804ReadCellVoltages(cellMonitorCellsTypeDef *cellVoltages);
-bool     driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArrayp[][12]);
+
+bool     driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]);
 uint8_t  driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][12]);
 void     driverSWLTC6804ReadCellVoltageGroups(uint8_t reg, uint8_t total_ic, uint8_t *data);
-int8_t   driverSWLTC6804ReadAuxVoltages(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]);
+
 bool     driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]);
+
+bool     driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6]);
+int8_t   driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]);
 void     driverSWLTC6804ReadAuxGroups(uint8_t reg, uint8_t total_ic,uint8_t *data);
+
 bool     driverSWLTC6804ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags);
 uint8_t  driverSWLTC6804ReadStatusValues(uint8_t total_ic, driverSWLTC6804StatusStructTypedef statusArray[]);
 void     driverSWLTC6804ReadStatusGroups(uint8_t reg, uint8_t total_ic, uint8_t *data );
@@ -212,4 +218,3 @@ void     driverSWLTC6804WriteRead(uint8_t *writeBytes, uint8_t writeLength, uint
 void     driverSWLTC6804WakeIC(void);
 uint16_t driverSWLTC6804CalcPEC15(uint8_t len, uint8_t *data);
 float    driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNominal,uint32_t ntcSeriesResistance,uint16_t ntcBetaFactor, float ntcNominalTemp);
-

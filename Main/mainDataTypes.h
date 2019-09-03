@@ -556,7 +556,10 @@ typedef enum {
 typedef enum {
 	CELL_MON_NONE = 0,
 	CELL_MON_LTC6803_2,
-	CELL_MON_LTC6804_1
+	CELL_MON_LTC6804_1,
+	CELL_MON_LTC6811_1,
+	CELL_MON_LTC6812_1,
+	CELL_MON_LTC6813_1
 } configCellMonitorICTypeEnum;
 
 typedef enum {
@@ -655,6 +658,11 @@ typedef struct {
 	uint8_t cellNumber;
 	bool    cellBleedActive;
 } cellMonitorCellsTypeDef;
+
+typedef struct {
+	float   auxVoltage;
+	uint8_t auxNumber;
+} auxMonitorTypeDef;
 
 typedef struct {
   float    voltages[12];

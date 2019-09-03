@@ -129,7 +129,7 @@ void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, mod
 	
 	// Sample the first pack voltage moment
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL)
-		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
+		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,modPowerElectronicsGeneralConfigHandle->voltageLCFactor/modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
 	
 	// Register terminal commands
 	modTerminalRegisterCommandCallBack("testbms","Test the cell connection between cell monitor and pack and pack vs cell measurement.","[error (V)] [bal drop (mV)]",modPowerElectronicsTerminalCellConnectionTest);
@@ -945,6 +945,8 @@ void modPowerElectronicsCellMonitorsCheckConfigAndReadAnalogData(void){
 			// Convert modules to full array
 			
 			// Read aux voltages
+			driverSWLTC6804ReadAuxVoltagesArray(modPowerElectronicsPackStateHandle->auxModuleVoltages);
+			modPowerElectronicsAuxMonitorsArrayTranslate();
 			//driverSWLTC6804ReadAuxSensors(modPowerElectronicsAuxVoltageArray);
 			//modPowerElectronicsPackStateHandle->temperatures[0] =	modPowerElectronicsPackStateHandle->temperatures[1] = driverSWLTC6804ConvertTemperatureExt(modPowerElectronicsAuxVoltageArray[1],modPowerElectronicsGeneralConfigHandle->NTC25DegResistance[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCTopResistor[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCBetaFactor[modConfigNTCGroupLTCExt],25.0f);
 		}break;
@@ -960,6 +962,17 @@ void modPowerElectronicsCellMonitorsArrayTranslate(void) {
 	  for(uint8_t modulePointerCell = 0; modulePointerCell < modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule; modulePointerCell++) {
 			modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
 			modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellNumber = individualCellPointer++;
+		}
+	}
+}
+
+void modPowerElectronicsAuxMonitorsArrayTranslate(void) {
+	uint8_t individualCellPointer = 0;
+	
+  for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
+	  for(uint8_t modulePointerCell = 0; modulePointerCell < 3; modulePointerCell++) {
+			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualCellPointer].auxVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
+			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualCellPointer].auxNumber = individualCellPointer++;
 		}
 	}
 }
@@ -1254,7 +1267,7 @@ void modPowerElectronicsSamplePackVoltage(float *voltagePointer) {
 			break;
 		case sourcePackVoltageISL28022_2_0X40_LVBatteryIn:
 			if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
+				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor/modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
 			}else{
 				*voltagePointer = 11.22f;
 			}
