@@ -522,7 +522,6 @@ void modPowerElectronicsSortCells(cellMonitorCellsTypeDef *cells, uint8_t cellCo
 };
 
 void modPowerElectronicsCalcTempStats(void) {
-	uint8_t sensorPointer;
 	
 	// Battery
 	float   tempBatteryMax;
@@ -552,20 +551,10 @@ void modPowerElectronicsCalcTempStats(void) {
 		tempBMSMin = 0.0f;
 	}
 	
-	for(sensorPointer = 0; sensorPointer < 16; sensorPointer++){
-		// Battery temperatures
-		if(modPowerElectronicsGeneralConfigHandle->tempEnableMaskBattery & (1 << sensorPointer)){
-			if(modPowerElectronicsPackStateHandle->temperatures[sensorPointer] > tempBatteryMax)
-				tempBatteryMax = modPowerElectronicsPackStateHandle->temperatures[sensorPointer];
-			
-			if(modPowerElectronicsPackStateHandle->temperatures[sensorPointer] < tempBatteryMin)
-				tempBatteryMin = modPowerElectronicsPackStateHandle->temperatures[sensorPointer];
-			
-			tempBatterySum += modPowerElectronicsPackStateHandle->temperatures[sensorPointer];
-			tempBatterySumCount++;
-		}
+	// BMS temperatures
 	
-		// BMS temperatures
+	for(uint8_t sensorPointer = 0; sensorPointer < 16; sensorPointer++){
+	
 		if(modPowerElectronicsGeneralConfigHandle->tempEnableMaskBMS & (1 << sensorPointer)){
 			if(modPowerElectronicsPackStateHandle->temperatures[sensorPointer] > tempBMSMax)
 				tempBMSMax = modPowerElectronicsPackStateHandle->temperatures[sensorPointer];
@@ -577,6 +566,20 @@ void modPowerElectronicsCalcTempStats(void) {
 			tempBMSSumCount++;
 		}
 	}
+
+	// Battery temperatures
+	
+	for(uint8_t sensorPointer = 0; sensorPointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount*6; sensorPointer++) {
+		if(modPowerElectronicsPackStateHandle->auxVoltagesIndividual[sensorPointer].auxVoltage > tempBatteryMax)
+			tempBatteryMax = modPowerElectronicsPackStateHandle->auxVoltagesIndividual[sensorPointer].auxVoltage;
+		
+		if(modPowerElectronicsPackStateHandle->auxVoltagesIndividual[sensorPointer].auxVoltage < tempBatteryMin)
+			tempBatteryMin = modPowerElectronicsPackStateHandle->auxVoltagesIndividual[sensorPointer].auxVoltage;
+		tempBatterySum += modPowerElectronicsPackStateHandle->auxVoltagesIndividual[sensorPointer].auxVoltage;
+		tempBatterySumCount++;		
+	}
+	
+
 	
 	// Battery temperatures
 	modPowerElectronicsPackStateHandle->tempBatteryHigh    = tempBatteryMax;
