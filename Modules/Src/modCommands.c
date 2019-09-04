@@ -7,7 +7,7 @@ bool jumpBootloaderTrue;
 modConfigGeneralConfigStructTypedef *modCommandsGeneralConfig;
 modConfigGeneralConfigStructTypedef *modCommandsToBeSendConfig;
 modConfigGeneralConfigStructTypedef  modCommandsConfigStorage;
-modPowerElectronicsPackStateTypedef   *modCommandsGeneralState;
+modPowerElectronicsPackStateTypedef *modCommandsGeneralState;
 
 void modCommandsInit(modPowerElectronicsPackStateTypedef   *generalState,modConfigGeneralConfigStructTypedef *configPointer) {
 	modCommandsGeneralConfig = configPointer;
@@ -122,6 +122,18 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 				  libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->cellVoltagesIndividual[cellPointer].cellVoltage*-1.0f, 1e3, &ind);    // Individual cells
 				else
 					libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->cellVoltagesIndividual[cellPointer].cellVoltage, 1e3, &ind);          // Individual cells
+			}
+		
+			modCommandsSendBuffer[ind++] = modCommandsGeneralConfig->CANID;
+			modCommandsSendPacket(modCommandsSendBuffer, ind);
+			break;
+		case COMM_GET_BMS_AUX:
+			ind = 0;
+			modCommandsSendBuffer[ind++] = COMM_GET_BMS_AUX;
+		
+		  libBufferAppend_uint8(modCommandsSendBuffer, modCommandsGeneralConfig->cellMonitorICCount*6, &ind);                // Total aux count
+		  for(cellPointer = 0; cellPointer < modCommandsGeneralConfig->cellMonitorICCount*6; cellPointer++){
+					libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->auxVoltagesIndividual[cellPointer].auxVoltage, 1e3, &ind);          // Individual aux
 			}
 		
 			modCommandsSendBuffer[ind++] = modCommandsGeneralConfig->CANID;

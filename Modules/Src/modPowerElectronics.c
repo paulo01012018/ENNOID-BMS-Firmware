@@ -102,13 +102,21 @@ void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, mod
 	modPowerElectronicsPackStateHandle->powerDownDesired         = false;
 	modPowerElectronicsPackStateHandle->powerOnLongButtonPress   = false;
 	
-	// init the module variables empty
+	// init the cell module variables empty
 	for( uint8_t modulePointer = 0; modulePointer < NoOfCellMonitorsPossibleOnBMS; modulePointer++) {
 		for(uint8_t cellPointer = 0; cellPointer < 12; cellPointer++)
 			modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][cellPointer] = 0.0f;
 		
 		modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[modulePointer] = 0x0000;
 	}
+	// init the aux module variables empty
+	for( uint8_t modulePointer = 0; modulePointer < NoOfCellMonitorsPossibleOnBMS; modulePointer++) {
+		for(uint8_t cellPointer = 0; cellPointer < 6; cellPointer++)
+			modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][cellPointer] = 0.0f;
+		
+		modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[modulePointer] = 0x0000;
+	}
+	
 	
 	// Init the external bus monitor
   modPowerElectronicsInitISL();
@@ -1023,7 +1031,10 @@ void modPowerElectronicsCellMonitorsStartTemperatureConversion(void) {
 			driverSWLTC6803StartTemperatureVoltageConversion();
 		}break;
 		case CELL_MON_LTC6804_1: {
-      // Measured simultaniously with cell voltages
+      // GPIO 1 & GPIO2 aux are measured simultaniously with cell voltages.
+			// For other GPIOs voltages conversions, the below functions are used.
+				driverSWLTC6804StartAuxVoltageConversion(MD_FILTERED, AUX_CH_ALL);
+				driverSWLTC6804ResetAuxRegisters();
 		}break;
 		default:
 			break;
