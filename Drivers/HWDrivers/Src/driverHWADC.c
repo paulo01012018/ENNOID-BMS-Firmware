@@ -67,7 +67,7 @@ void driverHWADCSetInputChannel(ADC_HandleTypeDef* hadc, uint32_t inputChannel) 
   }
 }
 
-bool driverHWADCGetLoadVoltage(float *loCurrentLoadVoltage) {
+bool driverHWADCGetLoadVoltage(float *loCurrentLoadVoltage, uint8_t cellMonitorICCount, uint8_t noOfParallelModules) {
 	uint32_t driverHWADCAverageSum = 0;
 	uint8_t	driverHWADCAverageCount = 0;
 	
@@ -82,7 +82,7 @@ bool driverHWADCGetLoadVoltage(float *loCurrentLoadVoltage) {
 	};
 	
 	uint16_t temp = driverHWADCAverageSum/NoOfAverages;
-	*loCurrentLoadVoltage = temp*(3.3f/4096*17.4f);
+	*loCurrentLoadVoltage = temp*(3.3f/4096*17.4f)/(cellMonitorICCount/noOfParallelModules);
 
 	return false;
 };

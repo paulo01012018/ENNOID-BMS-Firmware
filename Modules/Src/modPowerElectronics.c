@@ -1356,7 +1356,7 @@ float modPowerElectronicsCalcPackCurrent(void){
 void modPowerElectronicsLCSenseSample(void) {
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
 		driverSWISL28022GetBusCurrent(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->loCurrentLoadCurrent,modPowerElectronicsGeneralConfigHandle->shuntLCOffset,modPowerElectronicsGeneralConfigHandle->shuntLCFactor);
-		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage);
+		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
 	}else{
 		modPowerElectronicsPackStateHandle->loCurrentLoadVoltage = 0.0f;
 		modPowerElectronicsPackStateHandle->loCurrentLoadCurrent = 0.0f;
