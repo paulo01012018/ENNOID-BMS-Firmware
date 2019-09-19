@@ -157,27 +157,6 @@ void driverSWLTC6804StartAuxVoltageConversion(uint8_t MD, uint8_t CHG) {
   driverSWLTC6804Write(cmd,4);
 }
 
-bool driverSWLTC6804ReadCellVoltages(cellMonitorCellsTypeDef *cellVoltages) {
-	bool dataValid = true;
-	static uint16_t cellVoltageCodes[1][12]; 
-	
-	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumberOfICs,cellVoltageCodes);
-	
-	if(driverSWLTC6804TotalNumberOfICs == 1) {
-		uint8_t cellPointer;
-		for(cellPointer = 0; cellPointer < 12; cellPointer++){
-			if(cellVoltageCodes[0][cellPointer]*0.0001f < 10.0f)
-			  cellVoltages[cellPointer].cellVoltage = cellVoltageCodes[0][cellPointer]*0.0001f;
-			else
-				dataValid = false;
-			cellVoltages[cellPointer].cellNumber = cellPointer;
-		}
-	}else{
-		dataValid = false;
-	}
-	
-	return dataValid;
-}
 
 bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]) {
 	bool dataValid = true;
@@ -197,7 +176,7 @@ bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]) {
 	return dataValid;
 }
 
-uint8_t driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][12] ) {
+uint8_t driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][12]) {
   const uint8_t NUM_RX_BYT = 8;
   const uint8_t BYT_IN_REG = 6;
   const uint8_t CELL_IN_REG = 3;
@@ -398,21 +377,21 @@ bool driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]){
 	return false;
 }
 
-bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6]) {
+bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6],uint32_t ntcNominal,uint32_t ntcSeriesResistance, uint16_t ntcBetaFactor,float ntcNominalTemp) {
 	bool dataValid = true;
 	uint16_t auxVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][6]; 
 	
 	driverSWLTC6804ReadAuxVoltageRegisters(AUX_CH_ALL,driverSWLTC6804TotalNumberOfICs,auxVoltageArrayCodes);
 	
   for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
-		for(uint8_t cellPointer = 0; cellPointer < 12; cellPointer++){
-			if(auxVoltageArrayCodes[modulePointer][cellPointer]*0.0001f < 10.0f)
-			  auxVoltagesArray[modulePointer][cellPointer] = auxVoltageArrayCodes[modulePointer][cellPointer]*0.0001f;
+		for(uint8_t auxPointer = 0; auxPointer < 6; auxPointer++){
+			if(auxVoltageArrayCodes[modulePointer][auxPointer]*0.0001f < 10.0f)
+			  auxVoltagesArray[modulePointer][auxPointer] = driverSWLTC6804ConvertTemperatureExt(auxVoltageArrayCodes[modulePointer][auxPointer], ntcNominal, ntcSeriesResistance, ntcBetaFactor, ntcNominalTemp);
 			else
 				dataValid = false;
 		}
   }
-	
+
 	return dataValid;
 }
 

@@ -418,7 +418,6 @@ void modPowerElectronicsSubTaskBalaningOld(void) {
 void modPowerElectronicsSubTaskVoltageWatch(void) {
 	static bool lastdisChargeLCAllowed = false;
 	static bool lastChargeAllowed = false;
-	//uint16_t hardUnderVoltageFlags, hardOverVoltageFlags;
 	
 	modPowerElectronicsCellMonitorsReadVoltageFlags(&hardUnderVoltageFlags,&hardOverVoltageFlags);
 	modPowerElectronicsCalculateCellStats();
@@ -474,6 +473,13 @@ void modPowerElectronicsSubTaskVoltageWatch(void) {
 	}else
 		modPowerElectronicsUnderAndOverVoltageErrorCount = 0;
 	
+		// Handle over current limits
+	if(modPowerElectronicsPackStateHandle->packCurrent>modPowerElectronicsGeneralConfigHandle->maxAllowedCurrent){
+			modPowerElectronicsPackStateHandle->packOperationalCellState = PACK_STATE_ERROR_OVER_CURRENT;
+		modPowerElectronicsPackStateHandle->disChargeLCAllowed = false;
+		modPowerElectronicsPackStateHandle->chargeAllowed = false;
+	}
+
 	
 	// update outputs directly if needed
 	if((lastChargeAllowed != modPowerElectronicsPackStateHandle->chargeAllowed) || (lastdisChargeLCAllowed != modPowerElectronicsPackStateHandle->disChargeLCAllowed)) {
@@ -956,7 +962,7 @@ void modPowerElectronicsCellMonitorsCheckConfigAndReadAnalogData(void){
 			// Convert modules to full array
 			
 			// Read aux voltages
-			driverSWLTC6804ReadAuxVoltagesArray(modPowerElectronicsPackStateHandle->auxModuleVoltages);
+			driverSWLTC6804ReadAuxVoltagesArray(modPowerElectronicsPackStateHandle->auxModuleVoltages,modPowerElectronicsGeneralConfigHandle->NTC25DegResistance[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCTopResistor[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCBetaFactor[modConfigNTCGroupLTCExt],25.0f);
 			modPowerElectronicsAuxMonitorsArrayTranslate();
 			//driverSWLTC6804ReadAuxSensors(modPowerElectronicsAuxVoltageArray);
 			//modPowerElectronicsPackStateHandle->temperatures[0] =	modPowerElectronicsPackStateHandle->temperatures[1] = driverSWLTC6804ConvertTemperatureExt(modPowerElectronicsAuxVoltageArray[1],modPowerElectronicsGeneralConfigHandle->NTC25DegResistance[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCTopResistor[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCBetaFactor[modConfigNTCGroupLTCExt],25.0f);
@@ -978,12 +984,12 @@ void modPowerElectronicsCellMonitorsArrayTranslate(void) {
 }
 
 void modPowerElectronicsAuxMonitorsArrayTranslate(void) {
-	uint8_t individualCellPointer = 0;
+	uint8_t individualAuxPointer = 0;
 	
   for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
-	  for(uint8_t modulePointerCell = 0; modulePointerCell < 3; modulePointerCell++) {
-			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualCellPointer].auxVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
-			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualCellPointer].auxNumber = individualCellPointer++;
+	  for(uint8_t modulePointerAux = 0; modulePointerAux < 5; modulePointerAux++) {
+			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxVoltage = modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][modulePointerAux];
+			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxNumber = individualAuxPointer++;
 		}
 	}
 }
@@ -1356,7 +1362,7 @@ float modPowerElectronicsCalcPackCurrent(void){
 void modPowerElectronicsLCSenseSample(void) {
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
 		driverSWISL28022GetBusCurrent(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->loCurrentLoadCurrent,modPowerElectronicsGeneralConfigHandle->shuntLCOffset,modPowerElectronicsGeneralConfigHandle->shuntLCFactor);
-		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
+		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage,modPowerElectronicsGeneralConfigHandle->noOfParallelModules, modPowerElectronicsGeneralConfigHandle->loadVoltageFactor);
 	}else{
 		modPowerElectronicsPackStateHandle->loCurrentLoadVoltage = 0.0f;
 		modPowerElectronicsPackStateHandle->loCurrentLoadCurrent = 0.0f;

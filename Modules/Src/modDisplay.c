@@ -35,13 +35,13 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 				driverSWSSD1306FillBuffer(libLogos[LOGO_DIEBIE],SSD1306_LCDHEIGHT*SSD1306_LCDWIDTH/8);
 				libGraphicsSetTextSize(2);
 				libGraphicsSetTextColor_0(WHITE);
-				libGraphicsSetCursor(10,SSD1306_LCDHEIGHT/2+10);
+				libGraphicsSetCursor(10,SSD1306_LCDHEIGHT/2+14);
 
 				libGraphicsWrite('V');
 				libGraphicsWrite('0');
 				libGraphicsWrite('.');
 				libGraphicsWrite('3');
-				libGraphicsWrite('0');
+				libGraphicsWrite('1');
 				break;
 			case DISP_MODE_LOAD:
 				driverSWSSD1306ClearDisplay();
@@ -54,9 +54,9 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 				break;
 			case DISP_MODE_POWEROFF:
 				driverSWSSD1306ClearDisplay();
-				libGraphicsSetTextSize(1);
+				libGraphicsSetTextSize(2);
 				libGraphicsSetTextColor_0(WHITE);
-				libGraphicsSetCursor(0,0);
+				libGraphicsSetCursor(SSD1306_LCDWIDTH/2-16,SSD1306_LCDHEIGHT/2-6);
 			
 				libGraphicsWrite('B');  
 				libGraphicsWrite('y');  

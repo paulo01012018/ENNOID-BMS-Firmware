@@ -36,6 +36,7 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 	uint32_t new_app_offset;
 	uint32_t delayTick;
 	uint8_t cellPointer;
+	uint8_t auxPointer;
 
 	packet_id = (COMM_PACKET_ID) data[0];
 	data++;
@@ -132,8 +133,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			modCommandsSendBuffer[ind++] = COMM_GET_BMS_AUX;
 		
 		  libBufferAppend_uint8(modCommandsSendBuffer, modCommandsGeneralConfig->cellMonitorICCount*6, &ind);                // Total aux count
-		  for(cellPointer = 0; cellPointer < modCommandsGeneralConfig->cellMonitorICCount*6; cellPointer++){
-					libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->auxVoltagesIndividual[cellPointer].auxVoltage, 1e3, &ind);          // Individual aux
+		  for(auxPointer = 0; auxPointer < modCommandsGeneralConfig->cellMonitorICCount*6; auxPointer++){
+					libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->auxVoltagesIndividual[auxPointer].auxVoltage, 1e3, &ind);          // Individual aux
 			}
 		
 			modCommandsSendBuffer[ind++] = modCommandsGeneralConfig->CANID;
@@ -167,6 +168,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			modCommandsGeneralConfig->shuntHCOffset                  = libBufferGet_int16(data,&ind);                  // 2
 			modCommandsGeneralConfig->voltageLCFactor	               = libBufferGet_float32_auto(data,&ind);           // 4
 			modCommandsGeneralConfig->voltageLCOffset                = libBufferGet_int16(data,&ind);                  // 2
+			modCommandsGeneralConfig->loadVoltageFactor	             = libBufferGet_float32_auto(data,&ind);           // 4
+			modCommandsGeneralConfig->loadVoltageOffset              = libBufferGet_int16(data,&ind);                  // 2
 		  modCommandsGeneralConfig->throttleChargeIncreaseRate     = libBufferGet_uint8(data,&ind);                  // 1
 		  modCommandsGeneralConfig->throttleDisChargeIncreaseRate  = libBufferGet_uint8(data,&ind);                  // 1
 		  modCommandsGeneralConfig->cellBalanceUpdateInterval      = libBufferGet_uint32(data,&ind);                 // 4
@@ -292,6 +295,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->shuntHCOffset                   ,&ind); // 2
 			libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->voltageLCFactor                 ,&ind); // 4
 			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->voltageLCOffset                 ,&ind); // 2
+			libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->loadVoltageFactor               ,&ind); // 4
+			libBufferAppend_int16(        modCommandsSendBuffer,modCommandsToBeSendConfig->loadVoltageOffset               ,&ind); // 2
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->throttleChargeIncreaseRate      ,&ind); // 1
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->throttleDisChargeIncreaseRate   ,&ind); // 1
 		  libBufferAppend_uint32(       modCommandsSendBuffer,modCommandsToBeSendConfig->cellBalanceUpdateInterval       ,&ind); // 4

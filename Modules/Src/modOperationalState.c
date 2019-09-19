@@ -324,6 +324,12 @@ void modOperationalStateTask(void) {
 		modOperationalStateSetNewState(OP_STATE_ERROR);														// TODO: show error message then power down
 	}
 	
+		if((modOperationalStatePackStatehandle->packOperationalCellState == PACK_STATE_ERROR_OVER_CURRENT) && (modOperationalStatePackStatehandle->packOperationalCellState != packOperationalCellStateLastErrorState)){
+		packOperationalCellStateLastErrorState = modOperationalStatePackStatehandle->packOperationalCellState; // Meganism to make error situation only trigger once
+		modOperationalStateSetNewState(OP_STATE_ERROR);														// TODO: show error message then power down
+	}
+	
+	
 	// Move the button pressed state to the status struct
 	modOperationalStatePackStatehandle->powerOnLongButtonPress = modPowerStateGetLongButtonPressState(); 
 	

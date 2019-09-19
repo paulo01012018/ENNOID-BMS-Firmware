@@ -13,8 +13,9 @@
 #include "stdbool.h"
 #include "math.h"
 
-#define NoOfCellsPossibleOnBMS	      60
-#define NoOfCellMonitorsPossibleOnBMS 5
+#define NoOfCellsPossibleOnBMS	      120
+#define NoOfCellMonitorsPossibleOnBMS 10
+#define NoOfAuxPossibleOnBMS	      	60
 #define NoOfTempSensors               14
 #define NoOfWaterSensors              6
 #define PRECHARGE_PERCENTAGE 		      0.75f
@@ -92,7 +93,7 @@ typedef struct {
 	uint8_t  buzzerOn;
 	uint8_t  watchDogTime;
 	cellMonitorCellsTypeDef cellVoltagesIndividual[NoOfCellsPossibleOnBMS];
-	auxMonitorTypeDef auxVoltagesIndividual[6];
+	auxMonitorTypeDef auxVoltagesIndividual[NoOfAuxPossibleOnBMS];
 	modPowerElectronicsPackOperationalCellStatesTypedef packOperationalCellState;
 	
 	
