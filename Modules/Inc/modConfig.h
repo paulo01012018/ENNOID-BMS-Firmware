@@ -86,6 +86,7 @@ typedef struct {
 	float    waterSensorThreshold;                                                // - The threshold the enabled water sensor input should pass in order to trigger the water detected state.
 	uint32_t tempEnableMaskBMS;																								    // Stores the mask to select what temperature sensor is enabled for the BMS.
 	uint32_t tempEnableMaskBattery;																								// Stores the mask to select what temperature sensor is enabled for the battery.
+	uint8_t  noOfTempSensorPerModule;                                             // Number of temperature sensor monitored per LTC68XX
 	uint8_t  LCUseDischarge;                                                      // Enable or disable switch output.
 	uint8_t  LCUsePrecharge;                                                      // choice whether to precharge or not.
 	uint8_t  allowChargingDuringDischarge;																				// Allow charging during discharge.

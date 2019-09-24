@@ -903,21 +903,60 @@ void modPowerElectronicsCellMonitorsInit(void){
 			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_SET);
 			
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:{
 			driverLTC6804ConfigStructTypedef configStruct;
-			configStruct.GPIO1                    = true;																										// Do not pull down this pin (false = pull down)
-			configStruct.GPIO2                    = true;																										// 
-			configStruct.GPIO3                    = true;																										// 
-			configStruct.GPIO4                    = true;																										// 
-			configStruct.GPIO5                    = true;																										//
-			configStruct.ReferenceON              = true;																										// Reference ON
-			configStruct.ADCOption                = true;																									  // ADC Option register for configuration of over sampling ratio
-			configStruct.noOfCells                = modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;// Number of cells to monitor (that can cause interrupt)
+			configStruct.GPIO1                    = true;																														// Do not pull down this pin (false = pull down)
+			configStruct.GPIO2                    = true;																														// 
+			configStruct.GPIO3                    = true;																														// 
+			configStruct.GPIO4                    = true;																														// 
+			configStruct.GPIO5                    = true;																														//
+			configStruct.ReferenceON              = true;																														// Reference ON
+			configStruct.ADCOption                = true;																											  		// ADC Option register for configuration of over sampling ratio
+			configStruct.noOfCells                = modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;			// Number of cells to monitor (that can cause interrupt)
 			configStruct.DisChargeEnableMask      = 0x0000;																									// Set enable state of discharge, 1=EnableDischarge, 0=DisableDischarge
 			configStruct.DischargeTimout          = 0;																											// Discharge timout value / limit
 			configStruct.CellUnderVoltageLimit    = modPowerElectronicsGeneralConfigHandle->cellHardUnderVoltage; // Undervoltage level, cell voltages under this limit will cause interrupt
 			configStruct.CellOverVoltageLimit     = modPowerElectronicsGeneralConfigHandle->cellHardOverVoltage;  // Over voltage limit, cell voltages over this limit will cause interrupt
-			driverSWLTC6804Init(configStruct,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount);   // Config the LTC6804
+			driverSWLTC6804Init(configStruct, modPowerElectronicsGeneralConfigHandle->cellMonitorICCount, 12, 6);   // Config for the LTC6804/LTC6811
+			
+			// Safety signal is managed by the controller, it is configured as open drain and will be kept low by. watchdog will make the output to be released.
+			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_RESET);
+		}break;
+		case CELL_MON_LTC6812_1:{
+			driverLTC6804ConfigStructTypedef configStruct;
+			configStruct.GPIO1                    = true;																														// Do not pull down this pin (false = pull down)
+			configStruct.GPIO2                    = true;																														// 
+			configStruct.GPIO3                    = true;																														// 
+			configStruct.GPIO4                    = true;																														// 
+			configStruct.GPIO5                    = true;																														//
+			configStruct.ReferenceON              = true;																														// Reference ON
+			configStruct.ADCOption                = true;																													  // ADC Option register for configuration of over sampling ratio
+			configStruct.noOfCells                = modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;			// Number of cells to monitor (that can cause interrupt)
+			configStruct.DisChargeEnableMask      = 0x0000;																													// Set enable state of discharge, 1=EnableDischarge, 0=DisableDischarge
+			configStruct.DischargeTimout          = 0;																															// Discharge timout value / limit
+			configStruct.CellUnderVoltageLimit    = modPowerElectronicsGeneralConfigHandle->cellHardUnderVoltage; 	// Undervoltage level, cell voltages under this limit will cause interrupt
+			configStruct.CellOverVoltageLimit     = modPowerElectronicsGeneralConfigHandle->cellHardOverVoltage;  	// Over voltage limit, cell voltages over this limit will cause interrupt
+			driverSWLTC6804Init(configStruct,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,15, 12);  	 // Config for the LTC6812
+			
+			// Safety signal is managed by the controller, it is configured as open drain and will be kept low by. watchdog will make the output to be released.
+			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_RESET);
+		}break;
+				case CELL_MON_LTC6813_1:{
+			driverLTC6804ConfigStructTypedef configStruct;
+			configStruct.GPIO1                    = true;																														// Do not pull down this pin (false = pull down)
+			configStruct.GPIO2                    = true;																														// 
+			configStruct.GPIO3                    = true;																														// 
+			configStruct.GPIO4                    = true;																														// 
+			configStruct.GPIO5                    = true;																														//
+			configStruct.ReferenceON              = true;																														// Reference ON
+			configStruct.ADCOption                = true;																									  				// ADC Option register for configuration of over sampling ratio
+			configStruct.noOfCells                = modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;			// Number of cells to monitor (that can cause interrupt)
+			configStruct.DisChargeEnableMask      = 0x0000;																													// Set enable state of discharge, 1=EnableDischarge, 0=DisableDischarge
+			configStruct.DischargeTimout          = 0;																															// Discharge timout value / limit
+			configStruct.CellUnderVoltageLimit    = modPowerElectronicsGeneralConfigHandle->cellHardUnderVoltage; 	// Undervoltage level, cell voltages under this limit will cause interrupt
+			configStruct.CellOverVoltageLimit     = modPowerElectronicsGeneralConfigHandle->cellHardOverVoltage;  	// Over voltage limit, cell voltages over this limit will cause interrupt
+			driverSWLTC6804Init(configStruct,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,18, 12);  	// Config for the LTC6813
 			
 			// Safety signal is managed by the controller, it is configured as open drain and will be kept low by. watchdog will make the output to be released.
 			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_RESET);
@@ -952,7 +991,10 @@ void modPowerElectronicsCellMonitorsCheckConfigAndReadAnalogData(void){
 			modPowerElectronicsPackStateHandle->temperatures[1] = driverSWLTC6803ConvertTemperatureExt(modPowerElectronicsAuxVoltageArray[1],modPowerElectronicsGeneralConfigHandle->NTC25DegResistance[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCTopResistor[modConfigNTCGroupLTCExt],modPowerElectronicsGeneralConfigHandle->NTCBetaFactor[modConfigNTCGroupLTCExt],25.0f);
 			modPowerElectronicsPackStateHandle->temperatures[2] = driverSWLTC6803ConvertTemperatureInt(modPowerElectronicsAuxVoltageArray[2]);
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
 			// Check config valid and reinit
 			// TODO: Implement
 			
@@ -987,9 +1029,11 @@ void modPowerElectronicsAuxMonitorsArrayTranslate(void) {
 	uint8_t individualAuxPointer = 0;
 	
   for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
-	  for(uint8_t modulePointerAux = 0; modulePointerAux < 5; modulePointerAux++) {
-			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxVoltage = modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][modulePointerAux];
-			modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxNumber = individualAuxPointer++;
+	  for(uint8_t modulePointerAux = 0; modulePointerAux < modPowerElectronicsGeneralConfigHandle->noOfTempSensorPerModule; modulePointerAux++) {
+			if(modulePointerAux != 5){		//Remove Aux register group B : AVBR4 & AVBR5 
+				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxVoltage = modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][modulePointerAux];
+				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxNumber = individualAuxPointer++;
+			}
 		}
 	}
 }
@@ -1002,7 +1046,10 @@ void modPowerElectronicsCellMonitorsStartCellConversion(void) {
 			driverSWLTC6803StartCellVoltageConversion();
 			driverSWLTC6803ResetCellVoltageRegisters();
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
 			driverSWLTC6804StartCellAndAuxVoltageConversion(MD_FILTERED,DCP_ENABLED);
 			driverSWLTC6804ResetCellVoltageRegisters();
 		}break;
@@ -1023,7 +1070,10 @@ void modPowerElectronicsCellMonitorsStartLoadedCellConversion(bool PUP) {
 				
 			driverSWLTC6803ResetCellVoltageRegisters();
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
 		  driverSWLTC6804StartLoadedCellVoltageConversion(MD_FILTERED,DCP_ENABLED,CELL_CH_ALL,PUP);
 			driverSWLTC6804ResetCellVoltageRegisters();
 		}break;
@@ -1039,7 +1089,10 @@ void modPowerElectronicsCellMonitorsStartTemperatureConversion(void) {
 		case CELL_MON_LTC6803_2: {
 			driverSWLTC6803StartTemperatureVoltageConversion();
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
       // GPIO 1 & GPIO2 aux are measured simultaniously with cell voltages.
 			// For other GPIOs voltages conversions, the below functions are used.
 				driverSWLTC6804StartAuxVoltageConversion(MD_FILTERED, AUX_CH_ALL);
@@ -1057,7 +1110,10 @@ void modPowerElectronicsCellMonitorsEnableBalanceResistors(uint16_t balanceEnabl
 		case CELL_MON_LTC6803_2: {
 			driverSWLTC6803EnableBalanceResistors(balanceEnableMask);
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
 			//driverSWLTC6804EnableBalanceResistorsArray(modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask);
 		}break;
 		default:
@@ -1073,7 +1129,10 @@ void modPowerElectronicsCellMonitorsEnableBalanceResistorsArray(){
 		case CELL_MON_LTC6803_2: {
 			driverSWLTC6803EnableBalanceResistors(modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[0]);
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1: {
 			driverSWLTC6804EnableBalanceResistorsArray(modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask);	
 		}break;
 		default:
@@ -1088,7 +1147,10 @@ void modPowerElectronicsCellMonitorsReadVoltageFlags(uint16_t *underVoltageFlags
 		case CELL_MON_LTC6803_2: {
 			driverSWLTC6803ReadVoltageFlags(underVoltageFlags,overVoltageFlags);
 		}break;
-		case CELL_MON_LTC6804_1: {
+		case CELL_MON_LTC6804_1:
+		case CELL_MON_LTC6811_1:
+		case CELL_MON_LTC6812_1:
+		case CELL_MON_LTC6813_1:{
 			driverSWLTC6804ReadVoltageFlags(underVoltageFlags,overVoltageFlags);
 		}break;
 		default:

@@ -123,8 +123,9 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->waterSensorThreshold                           = 20.0f;                   // Declare water detected when one of the sensors go above this value
 	configLocation->tempEnableMaskBMS                              = 0x0008;									// Bitwise select what sensor to enable for the BMS (internal sensors).
 	configLocation->tempEnableMaskBattery                          = 0x0001;									// Bitwise select what sensor to enable for the battery (external sensors).
-  configLocation->LCUseDischarge                                 = enabled;                    // Enable or disable the solid state output
-	configLocation->LCUsePrecharge                                 = persistent;                    		// Use precharge before enabling main output
+  configLocation->noOfTempSensorPerModule            						 = 5;												// Number of temperature sensors monitored per LTC68XX
+	configLocation->LCUseDischarge                                 = enabled;                 // Enable or disable the solid state output
+	configLocation->LCUsePrecharge                                 = persistent;              // Use precharge before enabling main output
 	configLocation->NTCTopResistor[modConfigNTCGroupLTCExt]        = 100000;                  // NTC Pullup resistor value
 	configLocation->NTCTopResistor[modConfigNTCGroupMasterPCB]     = 100000;                  // NTC Pullup resistor value
 	configLocation->NTC25DegResistance[modConfigNTCGroupLTCExt]    = 100000;                  // NTC resistance at 25 degree

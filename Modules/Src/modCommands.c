@@ -210,6 +210,7 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			modCommandsGeneralConfig->waterSensorThreshold           = libBufferGet_float32_auto(data,&ind);           // 4
 			modCommandsGeneralConfig->tempEnableMaskBMS              = libBufferGet_uint32(data,&ind);                 // 4
 			modCommandsGeneralConfig->tempEnableMaskBattery          = libBufferGet_uint32(data,&ind);                 // 4
+			modCommandsGeneralConfig->noOfTempSensorPerModule        = libBufferGet_uint8(data,&ind);		               // 1
 		  modCommandsGeneralConfig->LCUseDischarge                 = libBufferGet_uint8(data,&ind);                  // 1
 			modCommandsGeneralConfig->LCUsePrecharge                 = libBufferGet_uint8(data,&ind);                  // 1
 			modCommandsGeneralConfig->allowChargingDuringDischarge   = libBufferGet_uint8(data,&ind);                  // 1
@@ -337,6 +338,7 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			libBufferAppend_float32_auto( modCommandsSendBuffer,modCommandsToBeSendConfig->waterSensorThreshold            ,&ind); // 4
 			libBufferAppend_uint32(       modCommandsSendBuffer,modCommandsToBeSendConfig->tempEnableMaskBMS               ,&ind); // 4
 			libBufferAppend_uint32(       modCommandsSendBuffer,modCommandsToBeSendConfig->tempEnableMaskBattery           ,&ind); // 4
+			libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->noOfTempSensorPerModule         ,&ind); // 1
 		  libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->LCUseDischarge                  ,&ind); // 1
 			libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->LCUsePrecharge                  ,&ind); // 1
 			libBufferAppend_uint8(        modCommandsSendBuffer,modCommandsToBeSendConfig->allowChargingDuringDischarge    ,&ind); // 1

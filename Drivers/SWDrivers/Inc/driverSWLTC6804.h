@@ -3,6 +3,7 @@
 #include "math.h"
 #include "mainDataTypes.h"
 #include "modDelay.h"
+#include "modConfig.h"
 
 /*
 	Pre computed crc15 table used for the LTC6804 PEC calculation
@@ -94,17 +95,18 @@ static const unsigned int crc15Table[256] = {
 #define CELL_CH_6and12 6
 
 
+
 /*!
 
   |CHG | Dec  |Channels to convert   | 
   |----|------|----------------------|
   |000 | 0    | All GPIOS and 2nd Ref| 
-  |001 | 1    | GPIO 1 			     |
+  |001 | 1    | GPIO 1 			    		 |
   |010 | 2    | GPIO 2               |
-  |011 | 3    | GPIO 3 			  	 |
-  |100 | 4    | GPIO 4 			  	 |
-  |101 | 5    | GPIO 5 			 	 |
-  |110 | 6    | Vref2  			  	 |
+  |011 | 3    | GPIO 3 			  			 |
+  |100 | 4    | GPIO 4 			  			 |
+  |101 | 5    | GPIO 5 			 				 |
+  |110 | 6    | Vref2  			  			 |
 */
 
 #define AUX_CH_ALL 0
@@ -184,7 +186,7 @@ typedef struct {
 	bool  muxFail;
 } driverSWLTC6804StatusStructTypedef;
 
-void     driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t totalNumberOfLTCs);
+void     driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t totalNumberOfLTCs, uint8_t maxNoOfCellPerModule, uint8_t maxNoOfTempSensorPerModule);
 void     driverSWLTC6804WriteConfigRegister(uint8_t totalNumberOfLTCs, uint16_t *balanceEnableMaskArray, bool useArray);
 void     driverSWLTC6804EnableBalanceResistors(uint16_t enableMask);
 void     driverSWLTC6804EnableBalanceResistorsArray(uint16_t *enableMask);
@@ -198,14 +200,14 @@ void     driverSWLTC6804StartLoadedCellVoltageConversion(uint8_t MD,uint8_t DCP,
 void     driverSWLTC6804StartAuxVoltageConversion(uint8_t MD, uint8_t CHG);
 
 
-bool     driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]);
-uint8_t  driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][12]);
+bool     driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][18]);
+uint8_t  driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][18]);
 void     driverSWLTC6804ReadCellVoltageGroups(uint8_t reg, uint8_t total_ic, uint8_t *data);
 
 bool     driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]);
 
-bool     driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6],uint32_t ntcNominal,uint32_t ntcSeriesResistance, uint16_t ntcBetaFactor,float ntcNominalTemp);
-int8_t   driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]);
+bool     driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][12],uint32_t ntcNominal,uint32_t ntcSeriesResistance, uint16_t ntcBetaFactor,float ntcNominalTemp);
+int8_t   driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][12]);
 void     driverSWLTC6804ReadAuxGroups(uint8_t reg, uint8_t total_ic,uint8_t *data);
 
 bool     driverSWLTC6804ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags);

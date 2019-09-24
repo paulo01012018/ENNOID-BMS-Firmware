@@ -139,8 +139,8 @@ typedef struct {
 	bool slaveShieldPresenceMainISL;
 	
 	// Slave modules -> TODO move into struct.
-	float    cellModuleVoltages[NoOfCellMonitorsPossibleOnBMS][12];
-	float    auxModuleVoltages[NoOfCellMonitorsPossibleOnBMS][6];
+	float    cellModuleVoltages[NoOfCellMonitorsPossibleOnBMS][18];
+	float    auxModuleVoltages[NoOfCellMonitorsPossibleOnBMS][12];
 	uint16_t cellModuleBalanceResistorEnableMask[NoOfCellMonitorsPossibleOnBMS];
 	
 } modPowerElectronicsPackStateTypedef;

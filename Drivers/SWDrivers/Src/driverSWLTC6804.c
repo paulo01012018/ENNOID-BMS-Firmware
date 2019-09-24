@@ -1,6 +1,10 @@
 #include "driverSWLTC6804.h"
 
 uint8_t driverSWLTC6804TotalNumberOfICs = 0;
+
+uint8_t driverSWLTC6804MaxNoOfCellPerModule = 0;
+uint8_t driverSWLTC6804MaxNoOfTempSensorPerModule = 0;
+
 driverLTC6804ConfigStructTypedef driverSWLTC6804ConfigStruct;
 uint32_t voltageLimitReg; 
 
@@ -9,9 +13,11 @@ void driverSWLTC6804DelayMS(uint32_t delayMS) {
 	while(!modDelayTick1ms(&currentTick,delayMS)){};
 }
 
-void driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t totalNumberOfLTCs) {		
+void driverSWLTC6804Init(driverLTC6804ConfigStructTypedef configStruct, uint8_t totalNumberOfLTCs, uint8_t noOfCellPerModule, uint8_t noOfTempSensorPerModule) {		
 	driverSWLTC6804ConfigStruct = configStruct;
 	driverSWLTC6804TotalNumberOfICs = totalNumberOfLTCs;
+	driverSWLTC6804MaxNoOfCellPerModule = noOfCellPerModule;
+	driverSWLTC6804MaxNoOfTempSensorPerModule = noOfTempSensorPerModule;
 	
 	uint8_t rxConfig [driverSWLTC6804TotalNumberOfICs][8];
 	uint8_t LTCScanCount = 0;
@@ -158,14 +164,14 @@ void driverSWLTC6804StartAuxVoltageConversion(uint8_t MD, uint8_t CHG) {
 }
 
 
-bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]) {
+bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][driverSWLTC6804MaxNoOfCellPerModule]) {
 	bool dataValid = true;
-	uint16_t cellVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][12]; 
+	uint16_t cellVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][driverSWLTC6804MaxNoOfCellPerModule]; 
 	
 	driverSWLTC6804ReadCellVoltageRegisters(CELL_CH_ALL,driverSWLTC6804TotalNumberOfICs,cellVoltageArrayCodes);
 	
   for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
-		for(uint8_t cellPointer = 0; cellPointer < 12; cellPointer++){
+		for(uint8_t cellPointer = 0; cellPointer < driverSWLTC6804MaxNoOfCellPerModule; cellPointer++){
 			if(cellVoltageArrayCodes[modulePointer][cellPointer]*0.0001f < 10.0f)
 			  cellVoltagesArray[modulePointer][cellPointer] = cellVoltageArrayCodes[modulePointer][cellPointer]*0.0001f;
 			else
@@ -176,7 +182,7 @@ bool driverSWLTC6804ReadCellVoltagesArray(float cellVoltagesArray[][12]) {
 	return dataValid;
 }
 
-uint8_t driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][12]) {
+uint8_t driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t cell_codes[][driverSWLTC6804MaxNoOfCellPerModule]) {
   const uint8_t NUM_RX_BYT = 8;
   const uint8_t BYT_IN_REG = 6;
   const uint8_t CELL_IN_REG = 3;
@@ -190,7 +196,7 @@ uint8_t driverSWLTC6804ReadCellVoltageRegisters(uint8_t reg, uint8_t total_ic, u
   cell_data = (uint8_t *) malloc((NUM_RX_BYT*total_ic)*sizeof(uint8_t));
 
   if (reg == 0) {
-    for(uint8_t cell_reg = 1; cell_reg<5; cell_reg++) {        			 			                 //executes once for each of the LTC6804 cell voltage registers
+    for(uint8_t cell_reg = 1; cell_reg<((driverSWLTC6804MaxNoOfCellPerModule/3)+1); cell_reg++) {        			 			                 //executes once for each of the LTC6804 cell voltage registers
       data_counter = 0;
       driverSWLTC6804ReadCellVoltageGroups(cell_reg, total_ic,cell_data );								                     //Reads a single Cell voltage register
       for (uint8_t current_ic = 0 ; current_ic < total_ic; current_ic++) { 			           // executes for every LTC6804 in the daisy chain current_ic is used as the IC counter
@@ -366,7 +372,7 @@ void driverSWLTC6804ReadStatusGroups(uint8_t reg, uint8_t total_ic, uint8_t *dat
 }
 
 bool driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]){
-	uint16_t readAuxSensors[1][6];
+	uint16_t readAuxSensors[1][12];
 	
 	driverSWLTC6804ReadAuxVoltageRegisters(0,1,readAuxSensors);
 	
@@ -377,14 +383,14 @@ bool driverSWLTC6804ReadAuxSensors(uint16_t tempVoltages[3]){
 	return false;
 }
 
-bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6],uint32_t ntcNominal,uint32_t ntcSeriesResistance, uint16_t ntcBetaFactor,float ntcNominalTemp) {
+bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][driverSWLTC6804MaxNoOfTempSensorPerModule],uint32_t ntcNominal,uint32_t ntcSeriesResistance, uint16_t ntcBetaFactor,float ntcNominalTemp) {
 	bool dataValid = true;
-	uint16_t auxVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][6]; 
+	uint16_t auxVoltageArrayCodes[driverSWLTC6804TotalNumberOfICs][driverSWLTC6804MaxNoOfTempSensorPerModule]; 
 	
 	driverSWLTC6804ReadAuxVoltageRegisters(AUX_CH_ALL,driverSWLTC6804TotalNumberOfICs,auxVoltageArrayCodes);
 	
   for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
-		for(uint8_t auxPointer = 0; auxPointer < 6; auxPointer++){
+		for(uint8_t auxPointer = 0; auxPointer < driverSWLTC6804MaxNoOfTempSensorPerModule; auxPointer++){
 			if(auxVoltageArrayCodes[modulePointer][auxPointer]*0.0001f < 10.0f)
 			  auxVoltagesArray[modulePointer][auxPointer] = driverSWLTC6804ConvertTemperatureExt(auxVoltageArrayCodes[modulePointer][auxPointer], ntcNominal, ntcSeriesResistance, ntcBetaFactor, ntcNominalTemp);
 			else
@@ -395,7 +401,7 @@ bool driverSWLTC6804ReadAuxVoltagesArray(float auxVoltagesArray[][6],uint32_t nt
 	return dataValid;
 }
 
-int8_t driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][6]) {
+int8_t driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uint16_t aux_codes[][driverSWLTC6804MaxNoOfTempSensorPerModule]) {
   const uint8_t NUM_RX_BYT = 8;
   const uint8_t BYT_IN_REG = 6;
   const uint8_t GPIO_IN_REG = 3;
@@ -409,7 +415,7 @@ int8_t driverSWLTC6804ReadAuxVoltageRegisters(uint8_t reg, uint8_t total_ic, uin
   data = (uint8_t *) malloc((NUM_RX_BYT*total_ic)*sizeof(uint8_t));
   //1.a
   if (reg == 0) {
-    for(uint8_t gpio_reg = 1; gpio_reg<3; gpio_reg++) {		 	   		 			                   //executes once for each of the LTC6804 aux voltage registers
+    for(uint8_t gpio_reg = 1; gpio_reg<((driverSWLTC6804MaxNoOfTempSensorPerModule/3)+1); gpio_reg++) {		 	   		 			                   //executes once for each of the LTC6804 aux voltage registers
       data_counter = 0;
       driverSWLTC6804ReadAuxGroups(gpio_reg, total_ic,data);									             //Reads the raw auxiliary register data into the data[] array
       for (uint8_t current_ic = 0 ; current_ic < total_ic; current_ic++) { 			           // executes for every LTC6804 in the daisy chain current_ic is used as the IC counter
