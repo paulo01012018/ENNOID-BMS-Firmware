@@ -13,9 +13,9 @@
 #include "stdbool.h"
 #include "math.h"
 
-#define NoOfCellsPossibleOnBMS	      120
+#define NoOfCellsPossibleOnBMS	      180
 #define NoOfCellMonitorsPossibleOnBMS 10
-#define NoOfAuxPossibleOnBMS	      	60
+#define NoOfAuxPossibleOnBMS	      	120
 #define NoOfTempSensors               14
 #define NoOfWaterSensors              6
 #define PRECHARGE_PERCENTAGE 		      0.75f
@@ -154,7 +154,7 @@ void  modPowerElectronicsSetCharge(bool newState);
 void  modPowerElectronicsDisableAll(void);
 void  modPowerElectronicsCalculateCellStats(void);
 void  modPowerElectronicsSubTaskBalaning(void);
-void  modPowerElectronicsCallMinitorsCalcBalanceResistorArray(void);
+void  modPowerElectronicsCallMonitorsCalcBalanceResistorArray(void);
 void  modPowerElectronicsSubTaskVoltageWatch(void);
 void  modPowerElectronicsUpdateSwitches(void);
 void  modPowerElectronicsSortCells(cellMonitorCellsTypeDef *cells, uint8_t cellCount);

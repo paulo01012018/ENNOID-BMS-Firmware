@@ -3,7 +3,7 @@
 #include "math.h"
 #include "mainDataTypes.h"
 #include "modDelay.h"
-#include "modConfig.h"
+
 
 /*
 	Pre computed crc15 table used for the LTC6804 PEC calculation
@@ -65,9 +65,9 @@ static const unsigned int crc15Table[256] = {
  
   |MD| Dec  | ADC Conversion Model|
   |--|------|---------------------|
-  |01| 1    | Fast 			   	  |
-  |10| 2    | Normal 			  |
-  |11| 3    | Filtered 		   	  |
+  |01| 1    | Fast 			   	  		|
+  |10| 2    | Normal 			 				|
+  |11| 3    | Filtered 		   	  	|
 */
 #define MD_FAST 1
 #define MD_NORMAL 2

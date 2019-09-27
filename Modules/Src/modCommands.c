@@ -132,8 +132,8 @@ void modCommandsProcessPacket(unsigned char *data, unsigned int len) {
 			ind = 0;
 			modCommandsSendBuffer[ind++] = COMM_GET_BMS_AUX;
 		
-		  libBufferAppend_uint8(modCommandsSendBuffer, modCommandsGeneralConfig->cellMonitorICCount*6, &ind);                // Total aux count
-		  for(auxPointer = 0; auxPointer < modCommandsGeneralConfig->cellMonitorICCount*6; auxPointer++){
+		  libBufferAppend_uint8(modCommandsSendBuffer, modCommandsGeneralConfig->cellMonitorICCount*modCommandsGeneralConfig->noOfTempSensorPerModule, &ind);                // Total aux count
+		  for(auxPointer = 0; auxPointer < modCommandsGeneralConfig->cellMonitorICCount*modCommandsGeneralConfig->noOfTempSensorPerModule; auxPointer++){
 					libBufferAppend_float16(modCommandsSendBuffer, modCommandsGeneralState->auxVoltagesIndividual[auxPointer].auxVoltage, 1e3, &ind);          // Individual aux
 			}
 		

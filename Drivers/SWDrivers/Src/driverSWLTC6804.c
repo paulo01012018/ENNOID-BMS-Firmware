@@ -622,7 +622,7 @@ float driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNomin
   steinhart = 1.0f / steinhart;                         // Invert
   steinhart -= 273.15f;                                 // convert to degree
 	
-	if(steinhart < -30.0f)
+	if(steinhart < -50.0f)
 		steinhart = 200;
 	
   return steinhart;

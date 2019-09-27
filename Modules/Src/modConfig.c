@@ -38,7 +38,6 @@ bool modConfigStoreDefaultConfig(void) {
 void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLocation) {
 	configLocation->maxSimultaneousDischargingCells = MIN(configLocation->maxSimultaneousDischargingCells,HW_LIM_CELL_BALANCE_MAX_SIMULTANEOUS_DISCHARGE);
 	configLocation->cellMonitorICCount              = MIN(configLocation->cellMonitorICCount             ,HW_LIM_CELL_MONITOR_IC_COUNT);
-	configLocation->cellMonitorType                 = HW_LIM_CELL_MONITOR_IC_TYPE;
 	
 	if(configLocation->notUsedTimeout)
 		configLocation->notUsedTimeout                = MAX(configLocation->notUsedTimeout                 ,HW_LIM_MIN_NOT_USED_DELAY);

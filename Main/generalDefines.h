@@ -11,8 +11,8 @@
 
 // Firmware version
 #define FW_VERSION_MAJOR		0
-#define FW_VERSION_MINOR		31
-#define FW_REAL_VERSION			"V0.31"
+#define FW_VERSION_MINOR		32
+#define FW_REAL_VERSION			"V0.32"
 
 // UUID
 #define STM32_UUID					((uint32_t*)0x1FFFF7AC)
@@ -53,7 +53,7 @@
 
 #ifdef ENNOID
   #define HW_NAME "ENNOID"
-	#define HW_LIM_CELL_BALANCE_MAX_SIMULTANEOUS_DISCHARGE 6
+	#define HW_LIM_CELL_BALANCE_MAX_SIMULTANEOUS_DISCHARGE 12
 	#define HW_LIM_CELL_MONITOR_IC_TYPE                    2
 	#define HW_LIM_CELL_MONITOR_IC_COUNT                   10
 	#define HW_LIM_MIN_NOT_USED_DELAY                      5000

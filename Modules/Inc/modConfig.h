@@ -18,7 +18,7 @@
 
 typedef struct {
 	// Master BMS
-	uint8_t  noOfCellsSeries;																											// Total number of cells in series in the battery pack
+	uint8_t noOfCellsSeries;																											// Total number of cells in series in the battery pack
 	uint8_t  noOfCellsParallel;                                                   // Number of cells in parallel group
 	uint8_t  noOfCellsPerModule;                                                  // Number of cell levels monitored per LTC68XX
 	uint8_t  noOfParallelModules;                                                 // Number of parallel modules
