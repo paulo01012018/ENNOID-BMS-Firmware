@@ -171,7 +171,9 @@ void modOperationalStateTask(void) {
 			modOperationalStateUpdateStates();
 			
 			modOperationalStateDisplayData.StateOfCharge = modOperationalStateGeneralStateOfCharge->generalStateOfCharge;
-
+			modOperationalStateDisplayData.Current = fabs(modOperationalStatePackStatehandle->packCurrent);
+			modOperationalStateDisplayData.PackVoltage = fabs(modOperationalStatePackStatehandle->packVoltage);
+			
 			modDisplayShowInfo(DISP_MODE_LOAD,modOperationalStateDisplayData);
 			break;
 		case OP_STATE_BATTERY_DEAD:

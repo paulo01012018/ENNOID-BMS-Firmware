@@ -41,12 +41,55 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 				libGraphicsWrite('0');
 				libGraphicsWrite('.');
 				libGraphicsWrite('3');
-				libGraphicsWrite('1');
+				libGraphicsWrite('2');
 				break;
 			case DISP_MODE_LOAD:
 				driverSWSSD1306ClearDisplay();
-				driverSWSSD1306FillBuffer(libLogos[LOGO_LOAD],SSD1306_LCDHEIGHT*SSD1306_LCDWIDTH/8);
-				libGraphicsFillRect(7,7,(uint16_t)(modDisplayData.StateOfCharge/100*106),50,WHITE);
+//				driverSWSSD1306FillBuffer(libLogos[LOGO_LOAD],SSD1306_LCDHEIGHT*SSD1306_LCDWIDTH/8);
+//				libGraphicsFillRect(7,7,(uint16_t)(modDisplayData.StateOfCharge/100*106),50,WHITE);
+			
+					libGraphicsSetTextSize(2);
+					libGraphicsSetTextColor_0(WHITE);
+		
+			//Display state of charge
+					libGraphicsSetCursor(7,7);
+					libGraphicsWrite('S');
+					libGraphicsWrite('O');
+					libGraphicsWrite('C');
+					libGraphicsWrite(':');
+			
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.StateOfCharge) !=48){
+						libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.StateOfCharge));
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.StateOfCharge) != 48 || modDisplay100ConvertIntegerToASCII(modDisplayData.StateOfCharge) !=48){
+							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.StateOfCharge));
+						}		
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.StateOfCharge));	
+					libGraphicsWrite('%');
+					
+			//Display current
+					libGraphicsSetCursor(7,27);
+					libGraphicsWrite('I');
+					libGraphicsWrite(':');
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.Current)!= 48){
+							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.Current));
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.Current)!= 48 || modDisplay100ConvertIntegerToASCII(modDisplayData.Current)!= 48){
+						libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.Current));
+						}						 
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.Current));	
+						
+			//Display Voltage
+					libGraphicsSetCursor(7,47);
+					libGraphicsWrite('V');
+					libGraphicsWrite(':');
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.PackVoltage) !=48){
+							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.PackVoltage));	
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.PackVoltage)!=48 || modDisplay100ConvertIntegerToASCII(modDisplayData.PackVoltage) != 48){
+							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.PackVoltage));
+						}					 
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.PackVoltage));	
 				break;
 			case DISP_MODE_CHARGE:
 				driverSWSSD1306ClearDisplay();
@@ -162,4 +205,23 @@ void modDisplayTask(void) {
 	
 	if(driverSWSSD1306DisplayAsync() != HAL_OK)
 		modDisplayPresent = false;
+};
+
+float modDisplay100ConvertIntegerToASCII(float value) {
+		value = (int)value/100;
+		value= value+48;
+	return value;
+};
+
+float modDisplay10ConvertIntegerToASCII(float value) {
+		value = (int)value % 100;
+		value = (int)value/10;
+		value = value+48;
+	return value;
+};
+
+float modDisplay1ConvertIntegerToASCII(float value) {
+		value = (int)value % 10;
+		value = value+48;
+	return value;
 };
