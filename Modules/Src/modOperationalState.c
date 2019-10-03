@@ -132,7 +132,7 @@ void modOperationalStateTask(void) {
 				modPowerElectronicsSetDisCharge(false);
 				modPowerElectronicsSetCharge(false);
 			}
-			
+		
 			if(modPowerStateChargerDetected() && !modOperationalStateGeneralConfigHandle->allowChargingDuringDischarge) {
 				modOperationalStateSetNewState(OP_STATE_INIT);
 				modPowerElectronicsSetDisCharge(false);
@@ -173,6 +173,9 @@ void modOperationalStateTask(void) {
 			modOperationalStateDisplayData.StateOfCharge = modOperationalStateGeneralStateOfCharge->generalStateOfCharge;
 			modOperationalStateDisplayData.Current = fabs(modOperationalStatePackStatehandle->packCurrent);
 			modOperationalStateDisplayData.PackVoltage = fabs(modOperationalStatePackStatehandle->packVoltage);
+			modOperationalStateDisplayData.HighestTemp = fabs(modOperationalStatePackStatehandle->tempBatteryHigh);
+			modOperationalStateDisplayData.AverageTemp = fabs(modOperationalStatePackStatehandle->tempBatteryAverage);
+			modOperationalStateDisplayData.LowestTemp = fabs(modOperationalStatePackStatehandle->tempBatteryLow);
 			
 			modDisplayShowInfo(DISP_MODE_LOAD,modOperationalStateDisplayData);
 			break;

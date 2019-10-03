@@ -75,11 +75,11 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->buzzerSignalSource                             = buzzerSourceOff;         // Stores what source shoud be taken to trigger
 	configLocation->buzzerSignalType                               = buzzerSignalTypeOn;      // Stores what sound pattern should be made
 	configLocation->buzzerSingalPersistant                         = true;                    // Stores whether the buzzer should stay on after triggering
-  configLocation->shuntLCFactor                                  = -0.004494f;              // Shunt factor low current
-	configLocation->shuntLCOffset                                  = 0;                       // Shunt offset low current
+  configLocation->shuntLCFactor                                  = -0.025f;              		// Shunt factor low current
+	configLocation->shuntLCOffset                                  = 22;                      // Shunt offset low current
   configLocation->shuntHCFactor	                                 = 0.001f;                  // Shunt factor high current
 	configLocation->shuntHCOffset                                  = -4;                      // Shunt offset high current
-	configLocation->voltageLCFactor	                               = 124.0f;                  // Voltage factor low current
+	configLocation->voltageLCFactor	                               = 48.0f;                  // Voltage factor low current
 	configLocation->voltageLCOffset                                = 0;                      // Voltage offset low current
 	configLocation->loadVoltageFactor	                             = 135.0f;                  // Voltage factor low current
 	configLocation->loadVoltageOffset                              = 0;                      // Voltage offset low current

@@ -79,7 +79,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						}						 
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.Current));	
 						
-			//Display Voltage
+			//Display Battery Voltage
 					libGraphicsSetCursor(7,47);
 					libGraphicsWrite('V');
 					libGraphicsWrite(':');
@@ -88,8 +88,56 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						}
 					if(modDisplay10ConvertIntegerToASCII(modDisplayData.PackVoltage)!=48 || modDisplay100ConvertIntegerToASCII(modDisplayData.PackVoltage) != 48){
 							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.PackVoltage));
-						}					 
+						}
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.PackVoltage));	
+						
+			//Display Max battery temperature
+					libGraphicsSetTextSize(1);
+					libGraphicsSetCursor(67,27);
+					libGraphicsWrite('T');
+					libGraphicsWrite('m');
+					libGraphicsWrite('a');
+					libGraphicsWrite('x');
+					libGraphicsWrite(':');
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.HighestTemp) !=48){
+							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.HighestTemp));	
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.HighestTemp)!=48 || modDisplay100ConvertIntegerToASCII(modDisplayData.HighestTemp) != 48){
+							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.HighestTemp));
+						}							
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.HighestTemp));
+						libGraphicsWrite('C');
+						
+			//Display Avg battery temperature
+					libGraphicsSetCursor(67,37);
+					libGraphicsWrite('T');
+					libGraphicsWrite('a');
+					libGraphicsWrite('v');
+					libGraphicsWrite('g');
+					libGraphicsWrite(':');
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.AverageTemp) !=48){
+							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.AverageTemp));	
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.AverageTemp)!=48 || modDisplay100ConvertIntegerToASCII(modDisplayData.AverageTemp) != 48){
+							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.AverageTemp));
+						}							
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.AverageTemp));
+						libGraphicsWrite('C');
+				//Display low battery temperature
+					libGraphicsSetCursor(67,47);
+					libGraphicsWrite('T');
+					libGraphicsWrite('l');
+					libGraphicsWrite('o');
+					libGraphicsWrite('w');
+					libGraphicsWrite(':');
+					if(modDisplay100ConvertIntegerToASCII(modDisplayData.LowestTemp) !=48){
+							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.LowestTemp));	
+						}
+					if(modDisplay10ConvertIntegerToASCII(modDisplayData.LowestTemp)!=48 || modDisplay100ConvertIntegerToASCII(modDisplayData.LowestTemp) != 48){
+							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.LowestTemp));
+						}							
+					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.LowestTemp));
+						libGraphicsWrite('C');
 				break;
 			case DISP_MODE_CHARGE:
 				driverSWSSD1306ClearDisplay();
@@ -209,7 +257,7 @@ void modDisplayTask(void) {
 
 float modDisplay100ConvertIntegerToASCII(float value) {
 		value = (int)value/100;
-		value= value+48;
+		value = value+48;
 	return value;
 };
 
