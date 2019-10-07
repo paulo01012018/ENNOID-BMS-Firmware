@@ -252,6 +252,12 @@ void driverSWLTC6804ReadCellVoltageGroups(uint8_t reg, uint8_t total_ic, uint8_t
   }else if(reg == 4) { //4: RDCVD
     cmd[1] = 0x0A;
     cmd[0] = 0x00;
+  }else if(reg == 5) { //5: RDCVE - LTC6812 & LTC6813 only
+    cmd[1] = 0x09;
+    cmd[0] = 0x00;
+  }else if(reg == 6) { //6: RDCVF - LTC6812 & LTC6813 only
+    cmd[1] = 0x0B;
+    cmd[0] = 0x00;
   }
 
   cmd_pec = driverSWLTC6804CalcPEC15(2, cmd);
@@ -468,10 +474,10 @@ void driverSWLTC6804ReadAuxGroups(uint8_t reg, uint8_t total_ic, uint8_t *data) 
   }else if(reg == 2) {		//Read back auxiliary group B 
     cmd[1] = 0x0e;
     cmd[0] = 0x00;
-  }else if(reg == 3) {		//Read back auxiliary group C LTC6812 & LTC6813 only
+  }else if(reg == 3) {		//Read auxiliary group C LTC6812 & LTC6813 only
     cmd[1] = 0x0d;
     cmd[0] = 0x00;
-  }else if(reg == 4) {		//Read back auxiliary group D LTC6812 & LTC6813 only
+  }else if(reg == 4) {		//Read auxiliary group D LTC6812 & LTC6813 only
     cmd[1] = 0x0f;
     cmd[0] = 0x00;
   }else{					     //Read back auxiliary group A
