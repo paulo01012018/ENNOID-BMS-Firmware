@@ -1030,8 +1030,11 @@ void modPowerElectronicsAuxMonitorsArrayTranslate(void) {
 	
   for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
 	  for(uint8_t modulePointerAux = 0; modulePointerAux < modPowerElectronicsGeneralConfigHandle->noOfTempSensorPerModule; modulePointerAux++) {
-			if(modulePointerAux != 5){		//Remove Aux register group B : AVBR4 & AVBR5 
+			if(modulePointerAux < 5){		
 				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxVoltage = modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][modulePointerAux];
+				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxNumber = individualAuxPointer++;
+			}else{ // when above 5, remove reference voltage measurement from Aux register group B : AVBR4 & AVBR5 for LTC6812 & LTC6813
+				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxVoltage = modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][modulePointerAux+1];
 				modPowerElectronicsPackStateHandle->auxVoltagesIndividual[individualAuxPointer].auxNumber = individualAuxPointer++;
 			}
 		}

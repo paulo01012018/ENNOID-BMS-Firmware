@@ -472,13 +472,13 @@ void driverSWLTC6804ReadAuxGroups(uint8_t reg, uint8_t total_ic, uint8_t *data) 
     cmd[1] = 0x0C;
     cmd[0] = 0x00;
   }else if(reg == 2) {		//Read back auxiliary group B 
-    cmd[1] = 0x0e;
+    cmd[1] = 0x0E;
     cmd[0] = 0x00;
   }else if(reg == 3) {		//Read auxiliary group C LTC6812 & LTC6813 only
-    cmd[1] = 0x0d;
+    cmd[1] = 0x0D;
     cmd[0] = 0x00;
   }else if(reg == 4) {		//Read auxiliary group D LTC6812 & LTC6813 only
-    cmd[1] = 0x0f;
+    cmd[1] = 0x0F;
     cmd[0] = 0x00;
   }else{					     //Read back auxiliary group A
      cmd[1] = 0x0C;		
