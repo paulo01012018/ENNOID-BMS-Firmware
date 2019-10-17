@@ -1,7 +1,0 @@
---cpu Cortex-M4.fp -g --apcs=interwork --pd "__MICROLIB SETA 1"
--I.\RTE\_DieBieMS
--IC:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.1.0\Drivers\CMSIS\Device\ST\STM32F3xx\Include
--IC:\Keil_v5\ARM\CMSIS\Include
--IC:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.1.0\Device\Include
---pd "__UVISION_VERSION SETA 526" --pd "STM32F303xC SETA 1"
---list startup_stm32f303xc.lst --xref -o diebiems\startup_stm32f303xc.o --depend diebiems\startup_stm32f303xc.d "..\Device\startup_stm32f303xc.s"

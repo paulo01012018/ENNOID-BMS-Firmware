@@ -51,7 +51,7 @@ void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLoc
 				
 				configLocation->lastICNoOfCells = configLocation->noOfCellsSeries % configLocation->noOfCellsPerModule; // This contains the last cells number monitored by the last serie IC 
 				
-				for(int bitPointer = 0; bitPointer < ( configLocation->noOfCellsSeries % configLocation->noOfCellsPerModule ) ; bitPointer++){
+				for(int bitPointer = 0; bitPointer < configLocation->lastICNoOfCells ; bitPointer++){
 					configLocation->lastICMask = (configLocation->lastICMask << 1)| 1 ; // This contains the last cells mask  used for disabling UV & OV flag in the last serie IC 
 				}	
 			};			

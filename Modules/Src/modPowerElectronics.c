@@ -114,7 +114,6 @@ void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, mod
 		for(uint8_t cellPointer = 0; cellPointer < modPowerElectronicsGeneralConfigHandle->noOfTempSensorPerModule; cellPointer++)
 			modPowerElectronicsPackStateHandle->auxModuleVoltages[modulePointer][cellPointer] = 0.0f;
 		
-		modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[modulePointer] = 0x0000;
 	}
 	
 	
@@ -175,7 +174,7 @@ bool modPowerElectronicsTask(void) {
 		modPowerElectronicsCalcThrottle();
 		
 		// Do the balancing task
-		modPowerElectronicsSubTaskBalaning();
+		modPowerElectronicsSubTaskBalancing();
 		
 		// Handle buzzer desires
 		modPowerElectronicsSubTaskBuzzer();
@@ -314,7 +313,7 @@ void modPowerElectronicsCalculateCellStats(void) {
 	modPowerElectronicsPackStateHandle->cellVoltageMisMatch = modPowerElectronicsPackStateHandle->cellVoltageHigh - modPowerElectronicsPackStateHandle->cellVoltageLow;
 };
 
-void modPowerElectronicsSubTaskBalaning(void) {
+void modPowerElectronicsSubTaskBalancing(void) {
 	static uint32_t delayTimeHolder = 100;
 //	static bool     delaytoggle = false;
 //	cellMonitorCellsTypeDef sortedCellArray[modPowerElectronicsGeneralConfigHandle->noOfCellsSeries];
@@ -383,7 +382,7 @@ void modPowerElectronicsCallMonitorsCalcBalanceResistorArray(void) {
 }
 
 // Old balance function
-void modPowerElectronicsSubTaskBalaningOld(void) {
+void modPowerElectronicsSubTaskBalancingOld(void) {
 	static uint32_t delayTimeHolder = 100;
 	static uint16_t lastCellBalanceRegister = 0;
 	static bool     delaytoggle = false;
@@ -1029,7 +1028,7 @@ void modPowerElectronicsCellMonitorsArrayTranslate(void) {
 	uint8_t individualCellPointer = 0;
 	
   for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
-		if((modulePointer+1) % (modPowerElectronicsGeneralConfigHandle->cellMonitorICCount/modPowerElectronicsGeneralConfigHandle->noOfParallelModules)==0){ // If end of serie string, use lastICNoOfCells instead of noOfCellsPerModule
+		if((modulePointer+1) % (modPowerElectronicsGeneralConfigHandle->cellMonitorICCount/modPowerElectronicsGeneralConfigHandle->noOfParallelModules)==0 && modulePointer != 0){ // If end of serie string, use lastICNoOfCells instead of noOfCellsPerModule
 			for(uint8_t modulePointerCell = 0; modulePointerCell < modPowerElectronicsGeneralConfigHandle->lastICNoOfCells; modulePointerCell++) {
 				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
 				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellNumber = individualCellPointer++;

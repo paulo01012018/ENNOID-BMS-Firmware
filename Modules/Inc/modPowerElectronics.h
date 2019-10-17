@@ -153,7 +153,7 @@ bool  modPowerElectronicsSetDisCharge(bool newState);
 void  modPowerElectronicsSetCharge(bool newState);
 void  modPowerElectronicsDisableAll(void);
 void  modPowerElectronicsCalculateCellStats(void);
-void  modPowerElectronicsSubTaskBalaning(void);
+void  modPowerElectronicsSubTaskBalancing(void);
 void  modPowerElectronicsCallMonitorsCalcBalanceResistorArray(void);
 void  modPowerElectronicsSubTaskVoltageWatch(void);
 void 	modPowerElectronicsSubTaskCurrentWatch(void);
