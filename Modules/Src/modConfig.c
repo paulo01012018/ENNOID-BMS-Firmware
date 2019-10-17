@@ -42,14 +42,34 @@ void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLoc
 	if(configLocation->notUsedTimeout)
 		configLocation->notUsedTimeout                = MAX(configLocation->notUsedTimeout                 ,HW_LIM_MIN_NOT_USED_DELAY);
 	
-	// Check for feasable cell count config
-	configLocation->noOfCellsPerModule = configLocation->noOfCellsSeries/configLocation->cellMonitorICCount;
-	
-	if((configLocation->noOfCellsPerModule*configLocation->cellMonitorICCount) != configLocation->noOfCellsSeries){
-		configLocation->noOfCellsSeries    = 12;
-		configLocation->cellMonitorICCount = 1;
-		configLocation->noOfCellsPerModule = 1;
-	}
+// Check for feasable parameters
+	if((configLocation->cellMonitorICCount % configLocation->noOfParallelModules) == 0){ // Check if feasable configuration
+			if(configLocation->noOfCellsSeries % (configLocation->cellMonitorICCount / configLocation->noOfParallelModules) == 0){
+				configLocation->noOfCellsPerModule = configLocation->noOfCellsSeries/(configLocation->cellMonitorICCount / configLocation->noOfParallelModules);
+			}else{ //Odd number of cells in series
+				configLocation->noOfCellsPerModule = (configLocation->noOfCellsSeries /(configLocation->cellMonitorICCount / configLocation->noOfParallelModules))+1;
+				
+				configLocation->lastICNoOfCells = configLocation->noOfCellsSeries % configLocation->noOfCellsPerModule; // This contains the last cells number monitored by the last serie IC 
+				
+				for(int bitPointer = 0; bitPointer < ( configLocation->noOfCellsSeries % configLocation->noOfCellsPerModule ) ; bitPointer++){
+					configLocation->lastICMask = (configLocation->lastICMask << 1)| 1 ; // This contains the last cells mask  used for disabling UV & OV flag in the last serie IC 
+				}	
+			};			
+		}else{
+			configLocation->noOfCellsSeries    = 12;
+			configLocation->cellMonitorICCount = 1;
+			configLocation->noOfCellsPerModule = 1;
+			configLocation->lastICNoOfCells = 0;
+			configLocation->lastICMask = 0;
+		};
+		
+		if (configLocation->noOfCellsPerModule <= 4){
+			configLocation->noOfCellsSeries    = 12;
+			configLocation->cellMonitorICCount = 1;
+			configLocation->noOfCellsPerModule = 1;
+			configLocation->lastICNoOfCells = 0;
+			configLocation->lastICMask = 0;
+		}
 }
 
 void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocation) {
@@ -79,10 +99,10 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->shuntLCOffset                                  = 28;                      // Shunt offset low current
   configLocation->shuntHCFactor	                                 = 0.001f;                  // Shunt factor high current
 	configLocation->shuntHCOffset                                  = -4;                      // Shunt offset high current
-	configLocation->voltageLCFactor	                               = 49.0f;                  // Voltage factor low current
-	configLocation->voltageLCOffset                                = 0;                      // Voltage offset low current
+	configLocation->voltageLCFactor	                               = 49.0f;                   // Voltage factor low current
+	configLocation->voltageLCOffset                                = 0;                       // Voltage offset low current
 	configLocation->loadVoltageFactor	                             = 259.0f;                  // Voltage factor low current
-	configLocation->loadVoltageOffset                              = 0;                      // Voltage offset low current
+	configLocation->loadVoltageOffset                              = 0.0f;                    // Voltage offset low current
 	configLocation->throttleChargeIncreaseRate                     = 1;                       // Percentage charge throttle increase rate per 100ms (cell voltage loop time)  
 	configLocation->throttleDisChargeIncreaseRate                  = 2;                       // Percentage discharge throttle increase rate per 100ms (cell voltage loop time)  	
 	configLocation->cellBalanceUpdateInterval									     = 4*1000;									// Keep calculated resistors enabled for this amount of time in miliseconds.
@@ -139,6 +159,8 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->useCANDelayedPowerDown                         = false;                   // Use delayed power down
 	configLocation->cellMonitorType                                = CELL_MON_LTC6804_1;      // Use the new cell voltage monitor
 	configLocation->cellMonitorICCount                             = 1;                       // Only one slave IC
+	configLocation->lastICNoOfCells																 = 0;
+	configLocation->lastICMask																		 = 0;
 	configLocation->externalEnableOperationalState                 = opStateExtNormal;        // Go to normal enable mode
 	configLocation->powerDownDelay                                 = 3000;                    // Wait only minimal to turn off
 	configLocation->canBusSpeed                                    = canSpeedBaud500k;        // 500k CAN baud

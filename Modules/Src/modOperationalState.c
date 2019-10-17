@@ -87,7 +87,7 @@ void modOperationalStateTask(void) {
 			modOperationalStateHandleChargerDisconnect(OP_STATE_POWER_DOWN);
 			modPowerElectronicsSetCharge(true);
 			
-			//Allow main contactors to close if load voltage is above pack voltage & below max allowed voltage, that mean that the charger is connected to the output
+			//Allow main contactors to close if load voltage is above pack voltage & below max allowed voltage, that means that the charger is connected to the output
 			if(modOperationalStatePackStatehandle->packVoltage-modOperationalStatePackStatehandle->loCurrentLoadVoltage < 0.0f && modOperationalStatePackStatehandle->loCurrentLoadVoltage < modOperationalStateGeneralConfigHandle->noOfCellsSeries*modOperationalStateGeneralConfigHandle->cellHardOverVoltage){ 
 				modPowerElectronicsSetDisCharge(true);
 				modPowerElectronicsSetPreCharge(true);

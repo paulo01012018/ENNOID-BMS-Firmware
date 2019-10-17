@@ -225,12 +225,12 @@ float modHiAmpShieldShuntMonitorGetVoltage(void) {
 		  break;
 	  case sourceLoadHCVoltageISL28022_2_0X40_LVBatteryIn:
 			if(modHiAmpPackStateHandle->slaveShieldPresenceMasterISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&measuredVoltage,1.0f);
+				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&measuredVoltage,0,1.0f);
 			}
 		  break;
 	  case sourceLoadHCVoltageISL28022_1_0X44_LVLoadOutput:
 			if(modHiAmpPackStateHandle->slaveShieldPresenceMainISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,&measuredVoltage,1.0f);
+				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,&measuredVoltage,0,1.0f);
 			}
 		  break;
 	  case sourceLoadHCVoltageISL28022_1_0X45_DCDC:

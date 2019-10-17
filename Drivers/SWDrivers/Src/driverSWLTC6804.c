@@ -6,7 +6,6 @@ uint8_t driverSWLTC6804MaxNoOfCellPerModule = 0;
 uint8_t driverSWLTC6804MaxNoOfTempSensorPerModule = 0;
 
 driverLTC6804ConfigStructTypedef driverSWLTC6804ConfigStruct;
-uint32_t voltageLimitReg; 
 
 void driverSWLTC6804DelayMS(uint32_t delayMS) {
 	uint32_t currentTick = HAL_GetTick();
@@ -255,7 +254,7 @@ void driverSWLTC6804ReadCellVoltageGroups(uint8_t reg, uint8_t total_ic, uint8_t
   }else if(reg == 5) { //5: RDCVE - LTC6812 & LTC6813 only
     cmd[1] = 0x09;
     cmd[0] = 0x00;
-  }else if(reg == 6) { //6: RDCVF - LTC6812 & LTC6813 only
+  }else if(reg == 6) { //6: RDCVF -  LTC6813 only
     cmd[1] = 0x0B;
     cmd[0] = 0x00;
   }
@@ -330,7 +329,7 @@ uint8_t driverSWLTC6804ReadStatusValues(uint8_t total_ic, driverSWLTC6804StatusS
 		// Extract DATA
 		statusArray[current_ic].voltageDigitalSupply = ((status_data[data_counter+1] << 8) | status_data[data_counter]) * 0.0001f;
 		
-		registersCombined = voltageLimitReg = (status_data[data_counter+4] << 16) | (status_data[data_counter+3] << 8) | status_data[data_counter+2];	// Combine all registers in one variable
+		registersCombined  = (status_data[data_counter+4] << 16) | (status_data[data_counter+3] << 8) | status_data[data_counter+2];	// Combine all registers in one variable
 		registersCombinedTemp = registersCombined & 0x00555555;																							// Filter out only the undervoltage bits
 		
 		for(int bitPointer = 0; bitPointer < driverSWLTC6804ConfigStruct.noOfCells; bitPointer++)
@@ -368,8 +367,11 @@ void driverSWLTC6804ReadStatusGroups(uint8_t reg, uint8_t total_ic, uint8_t *dat
   }else if(reg == 2) { //2: RDSTATB
     cmd[1] = 0x12;
     cmd[0] = 0x00;
+  }else if(reg == 3) {		//Read auxiliary group D LTC6812 & LTC6813 only for AVDR4 & AVDR5 OV & UV flags
+    cmd[1] = 0x0F;
+    cmd[0] = 0x00;
   }
-
+	
   cmd_pec = driverSWLTC6804CalcPEC15(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec); 
@@ -628,8 +630,8 @@ float driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNomin
   steinhart = 1.0f / steinhart;                         // Invert
   steinhart -= 273.15f;                                 // convert to degree
 	
-	if(steinhart < -50.0f)
-		steinhart = 200;
+	if(steinhart < -50.0f || (float)inputValue >= 30000.0f)
+		steinhart = 75;
 	
   return steinhart;
 }

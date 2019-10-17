@@ -46,7 +46,7 @@ typedef struct {
 	float    voltageLCFactor;                                                     // Battery Voltage multiplication factor Low current
 	int16_t  voltageLCOffset;                                                     // Battery Voltage low current offset
 	float    loadVoltageFactor;                                                   // Load Voltage multiplication factor 
-	int16_t  loadVoltageOffset;                                                   // Load Voltage offset
+	float		 loadVoltageOffset;                                                   // Load Voltage offset
 	uint8_t  throttleChargeIncreaseRate;																					// The rate of charge throttle percentage increase per 100ms
 	uint8_t  throttleDisChargeIncreaseRate;                                       // The rate of discharge throttle percentage instrease per 100ms
 	uint32_t cellBalanceUpdateInterval;																						// Amount of time that the balance resistor enable mask is kept
@@ -97,7 +97,9 @@ typedef struct {
 	uint8_t  useCANDelayedPowerDown;                                              // Config that holds the preference whethet to used delayes power down
 	uint8_t  cellMonitorType;                                  										// The cell monitor IC type
   uint8_t  cellMonitorICCount;																									// The amount of cell monitor IC's connected
-  uint8_t  externalEnableOperationalState;                  										// The state to enter when externally enabled
+	uint8_t	 lastICNoOfCells;																											// Store number of cells in the last module (Used for odd number of cells in series only)
+	uint32_t lastICMask;																													// Stores the mask to select what cell should be monitored when last IC is not equal to other ones (Used for odd number of cells in series only)
+	uint8_t  externalEnableOperationalState;                  										// The state to enter when externally enabled
 	uint32_t powerDownDelay;																											// The delay time between going to power down and turning off
 	uint8_t  canBusSpeed;																													// CAN bus baudrate
 	uint8_t  chargeEnableOperationalState;                                        // State to enter when BMS is turned on due to charger

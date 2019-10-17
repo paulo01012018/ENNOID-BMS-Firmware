@@ -137,7 +137,7 @@ void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, mod
 	
 	// Sample the first pack voltage moment
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL)
-		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,modPowerElectronicsGeneralConfigHandle->voltageLCFactor/modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
+		driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->packVoltage,modPowerElectronicsGeneralConfigHandle->voltageLCOffset, modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 	
 	// Register terminal commands
 	modTerminalRegisterCommandCallBack("testbms","Test the cell connection between cell monitor and pack and pack vs cell measurement.","[error (V)] [bal drop (mV)]",modPowerElectronicsTerminalCellConnectionTest);
@@ -183,8 +183,14 @@ bool modPowerElectronicsTask(void) {
 		// Measure cell voltages
 		modPowerElectronicsCellMonitorsStartCellConversion();
 		
+		//Measure temperature voltages
+		modPowerElectronicsCellMonitorsStartTemperatureConversion();
+		
 		// Check and respond to the measured voltage values
 		modPowerElectronicsSubTaskVoltageWatch();
+		
+		// Check and respond to the measured current values
+		modPowerElectronicsSubTaskCurrentWatch();
 		
 		// Check water sensors and report state
 		modPowerElectronicsCheckWaterSensors();
@@ -226,9 +232,6 @@ bool modPowerElectronicsTask(void) {
 		returnValue = true;
 	}else
 		returnValue = false;
-	
-	if(modDelayTick1msNoRST(&modPowerElectronicsTempMeasureDelayLastTick,50))
-		modPowerElectronicsCellMonitorsStartTemperatureConversion();
 	
 	return returnValue;
 };
@@ -297,7 +300,7 @@ void modPowerElectronicsCalculateCellStats(void) {
 	modPowerElectronicsPackStateHandle->cellVoltageHigh = 0.0f;
 	modPowerElectronicsPackStateHandle->cellVoltageLow = 10.0f;
 	
-	for(uint8_t cellPointer = 0; cellPointer < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries; cellPointer++) {
+	for(uint8_t cellPointer = 0; cellPointer < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; cellPointer++) {
 		cellVoltagesSummed += modPowerElectronicsPackStateHandle->cellVoltagesIndividual[cellPointer].cellVoltage;
 		
 		if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[cellPointer].cellVoltage > modPowerElectronicsPackStateHandle->cellVoltageHigh)
@@ -307,7 +310,7 @@ void modPowerElectronicsCalculateCellStats(void) {
 			modPowerElectronicsPackStateHandle->cellVoltageLow = modPowerElectronicsPackStateHandle->cellVoltagesIndividual[cellPointer].cellVoltage;		
 	}
 	
-	modPowerElectronicsPackStateHandle->cellVoltageAverage = cellVoltagesSummed/modPowerElectronicsGeneralConfigHandle->noOfCellsSeries;
+	modPowerElectronicsPackStateHandle->cellVoltageAverage = cellVoltagesSummed/modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules;
 	modPowerElectronicsPackStateHandle->cellVoltageMisMatch = modPowerElectronicsPackStateHandle->cellVoltageHigh - modPowerElectronicsPackStateHandle->cellVoltageLow;
 };
 
@@ -331,7 +334,7 @@ void modPowerElectronicsSubTaskBalaning(void) {
 			//temp remove true
 			if((modPowerElectronicsPackStateHandle->chargeDesired && !modPowerElectronicsPackStateHandle->disChargeDesired) || modPowerElectronicsPackStateHandle->chargeBalanceActive || true) {																							// Check if charging is desired. Removed: || !modPowerElectronicsPackStateHandle->chargeAllowed
 				// Old for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->maxSimultaneousDischargingCells; i++) {
-				for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries; i++) {
+				for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
 					if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellVoltage >= (modPowerElectronicsPackStateHandle->cellVoltageLow + modPowerElectronicsGeneralConfigHandle->cellBalanceDifferenceThreshold)) {
 						if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellVoltage >= modPowerElectronicsGeneralConfigHandle->cellBalanceStart) {
 							modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellBleedActive = true;
@@ -359,14 +362,18 @@ void modPowerElectronicsSubTaskBalaning(void) {
 void modPowerElectronicsCallMonitorsCalcBalanceResistorArray(void) {
 	uint8_t modulePointer = 0;
 	uint8_t cellInMaskPointer = 0;
+	uint8_t seriesCount = 0;
+	uint8_t moduleCount = 0;
 	
 	// Clear array
 	for(uint8_t moduleClearPointer = 0; moduleClearPointer < NoOfCellMonitorsPossibleOnBMS; moduleClearPointer++) 
 		modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[moduleClearPointer] = 0;
 	
-	for(uint8_t cellPointer = 0; cellPointer < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries; cellPointer++) {
-		modulePointer = cellPointer/modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;
-		cellInMaskPointer = cellPointer % modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;
+	for(uint8_t cellPointer = 0; cellPointer < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; cellPointer++) {
+		seriesCount = cellPointer/modPowerElectronicsGeneralConfigHandle->noOfCellsSeries; 
+		moduleCount = seriesCount*(modPowerElectronicsGeneralConfigHandle->cellMonitorICCount/modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
+		modulePointer = moduleCount + (cellPointer % modPowerElectronicsGeneralConfigHandle->noOfCellsSeries)/modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;
+		cellInMaskPointer = (cellPointer - (seriesCount*modPowerElectronicsGeneralConfigHandle->noOfCellsSeries)) % modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule;
 		
 		if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[cellPointer].cellBleedActive)
 		  modPowerElectronicsPackStateHandle->cellModuleBalanceResistorEnableMask[modulePointer] |= (1 << cellInMaskPointer);
@@ -473,12 +480,7 @@ void modPowerElectronicsSubTaskVoltageWatch(void) {
 	}else
 		modPowerElectronicsUnderAndOverVoltageErrorCount = 0;
 	
-		// Handle over current limits
-	if(modPowerElectronicsPackStateHandle->packCurrent>modPowerElectronicsGeneralConfigHandle->maxAllowedCurrent){
-			modPowerElectronicsPackStateHandle->packOperationalCellState = PACK_STATE_ERROR_OVER_CURRENT;
-		modPowerElectronicsPackStateHandle->disChargeLCAllowed = false;
-		modPowerElectronicsPackStateHandle->chargeAllowed = false;
-	}
+
 
 	
 	// update outputs directly if needed
@@ -486,6 +488,15 @@ void modPowerElectronicsSubTaskVoltageWatch(void) {
 		lastChargeAllowed = modPowerElectronicsPackStateHandle->chargeAllowed;
 		lastdisChargeLCAllowed = modPowerElectronicsPackStateHandle->disChargeLCAllowed;
 		modPowerElectronicsUpdateSwitches();
+	}
+};
+
+void 	modPowerElectronicsSubTaskCurrentWatch(void){
+		// Handle over current limits 
+	if(modPowerElectronicsPackStateHandle->packCurrent > modPowerElectronicsGeneralConfigHandle->maxAllowedCurrent){
+			modPowerElectronicsPackStateHandle->packOperationalCellState = PACK_STATE_ERROR_OVER_CURRENT;
+			modPowerElectronicsPackStateHandle->disChargeLCAllowed = false;
+			modPowerElectronicsPackStateHandle->chargeAllowed = false;
 	}
 };
 
@@ -1018,10 +1029,17 @@ void modPowerElectronicsCellMonitorsArrayTranslate(void) {
 	uint8_t individualCellPointer = 0;
 	
   for(uint8_t modulePointer = 0; modulePointer < modPowerElectronicsGeneralConfigHandle->cellMonitorICCount; modulePointer++) {
-	  for(uint8_t modulePointerCell = 0; modulePointerCell < modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule; modulePointerCell++) {
-			modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
-			modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellNumber = individualCellPointer++;
-		}
+		if((modulePointer+1) % (modPowerElectronicsGeneralConfigHandle->cellMonitorICCount/modPowerElectronicsGeneralConfigHandle->noOfParallelModules)==0){ // If end of serie string, use lastICNoOfCells instead of noOfCellsPerModule
+			for(uint8_t modulePointerCell = 0; modulePointerCell < modPowerElectronicsGeneralConfigHandle->lastICNoOfCells; modulePointerCell++) {
+				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
+				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellNumber = individualCellPointer++;
+			}
+		}else{ // use noOfCellsPerModule as usually
+			for(uint8_t modulePointerCell = 0; modulePointerCell < modPowerElectronicsGeneralConfigHandle->noOfCellsPerModule; modulePointerCell++) {
+				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellVoltage = modPowerElectronicsPackStateHandle->cellModuleVoltages[modulePointer][modulePointerCell];
+				modPowerElectronicsPackStateHandle->cellVoltagesIndividual[individualCellPointer].cellNumber = individualCellPointer++;
+			}
+		};
 	}
 }
 
@@ -1352,21 +1370,21 @@ void modPowerElectronicsSamplePackVoltage(float *voltagePointer) {
 			break;
 		case sourcePackVoltageISL28022_2_0X40_LVBatteryIn:
 			if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor/modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
+				driverSWISL28022GetBusVoltage(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCOffset, modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 11.22f;
 			}
 			break;
 		case sourcePackVoltageISL28022_1_0X44_LVLoadOutput:
 			if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMainISL) {
-				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
+				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_MAIN_ADDRES,ISL28022_SHIELD_MAIN_BUS,voltagePointer, modPowerElectronicsGeneralConfigHandle->voltageLCOffset, modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 22.11f;
 			}
 			break;
 		case sourcePackVoltageISL28022_1_0X45_DCDC:
 			if(modPowerElectronicsPackStateHandle->hiAmpShieldPresent) {
-				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,voltagePointer,modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
+				driverSWISL28022GetBusVoltage(ISL28022_SHIELD_AUX_ADDRES,ISL28022_SHIELD_AUX_BUS,voltagePointer, modPowerElectronicsGeneralConfigHandle->voltageLCOffset, modPowerElectronicsGeneralConfigHandle->voltageLCFactor);
 			}else{
 				*voltagePointer = 0.0f;
 			}
@@ -1427,7 +1445,7 @@ float modPowerElectronicsCalcPackCurrent(void){
 void modPowerElectronicsLCSenseSample(void) {
 	if(modPowerElectronicsPackStateHandle->slaveShieldPresenceMasterISL) {
 		driverSWISL28022GetBusCurrent(ISL28022_MASTER_ADDRES,ISL28022_MASTER_BUS,&modPowerElectronicsPackStateHandle->loCurrentLoadCurrent,modPowerElectronicsGeneralConfigHandle->shuntLCOffset,modPowerElectronicsGeneralConfigHandle->shuntLCFactor);
-		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage,modPowerElectronicsGeneralConfigHandle->noOfParallelModules, modPowerElectronicsGeneralConfigHandle->loadVoltageFactor);
+		driverHWADCGetLoadVoltage(&modPowerElectronicsPackStateHandle->loCurrentLoadVoltage, modPowerElectronicsGeneralConfigHandle->loadVoltageOffset, modPowerElectronicsGeneralConfigHandle->loadVoltageFactor);
 	}else{
 		modPowerElectronicsPackStateHandle->loCurrentLoadVoltage = 0.0f;
 		modPowerElectronicsPackStateHandle->loCurrentLoadCurrent = 0.0f;

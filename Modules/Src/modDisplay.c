@@ -93,7 +93,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						
 			//Display Max battery temperature
 					libGraphicsSetTextSize(1);
-					libGraphicsSetCursor(67,27);
+					libGraphicsSetCursor(75,27);
 					libGraphicsWrite('T');
 					libGraphicsWrite('m');
 					libGraphicsWrite('a');
@@ -109,7 +109,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						libGraphicsWrite('C');
 						
 			//Display Avg battery temperature
-					libGraphicsSetCursor(67,37);
+					libGraphicsSetCursor(75,37);
 					libGraphicsWrite('T');
 					libGraphicsWrite('a');
 					libGraphicsWrite('v');
@@ -124,7 +124,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.AverageTemp));
 						libGraphicsWrite('C');
 				//Display low battery temperature
-					libGraphicsSetCursor(67,47);
+					libGraphicsSetCursor(75,47);
 					libGraphicsWrite('T');
 					libGraphicsWrite('l');
 					libGraphicsWrite('o');

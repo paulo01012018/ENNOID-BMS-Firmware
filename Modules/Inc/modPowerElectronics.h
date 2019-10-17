@@ -156,6 +156,7 @@ void  modPowerElectronicsCalculateCellStats(void);
 void  modPowerElectronicsSubTaskBalaning(void);
 void  modPowerElectronicsCallMonitorsCalcBalanceResistorArray(void);
 void  modPowerElectronicsSubTaskVoltageWatch(void);
+void 	modPowerElectronicsSubTaskCurrentWatch(void);
 void  modPowerElectronicsUpdateSwitches(void);
 void  modPowerElectronicsSortCells(cellMonitorCellsTypeDef *cells, uint8_t cellCount);
 void  modPowerElectronicsCalcTempStats(void);
