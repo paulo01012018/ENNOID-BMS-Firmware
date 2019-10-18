@@ -110,7 +110,7 @@ void driverSWLTC6803WriteConfig(driverLTC6803ConfigStructTypedef configStruct);
 bool driverSWLTC6803ReadConfigRegisters(uint8_t total_ic, uint8_t r_config[][7]);
 bool driverSWLTC6803ReadConfig(driverLTC6803ConfigStructTypedef *configStruct);
 bool driverSWLTC6803ReadFlagRegisters(uint8_t total_ic, uint8_t flagRegisters[][4]);
-bool driverSWLTC6803ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags);
+bool driverSWLTC6803ReadVoltageFlags(uint32_t *underVoltageFlags, uint32_t *overVoltageFlags);
 void driverSWLTC6803EnableBalanceResistors(uint16_t balanceEnableMask);
 
 // Calculating CRC for communication

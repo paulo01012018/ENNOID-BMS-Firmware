@@ -261,7 +261,7 @@ bool driverSWLTC6803ReadFlagRegisters(uint8_t total_ic, uint8_t flagRegisters[][
   return pec_error;
 };
 
-bool driverSWLTC6803ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags) {
+bool driverSWLTC6803ReadVoltageFlags(uint32_t *underVoltageFlags, uint32_t *overVoltageFlags) {
 	bool returnVal = false;
 	uint8_t flagRegisters[1][4];
 	uint32_t registersCombined;

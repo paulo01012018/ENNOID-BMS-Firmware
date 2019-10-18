@@ -267,10 +267,10 @@ void driverSWLTC6804ReadCellVoltageGroups(uint8_t reg, uint8_t total_ic, uint8_t
 	driverSWLTC6804WriteRead(cmd,4,data,(REG_LEN*total_ic));
 }
 
-bool driverSWLTC6804ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags) {
+bool driverSWLTC6804ReadVoltageFlags(uint32_t *underVoltageFlags, uint32_t *overVoltageFlags, uint32_t lastICMask, uint8_t noOfParallelModules) {
 	// Variables
-	uint16_t newVoltageUnder = 0;
-	uint16_t newVoltageOver  = 0;
+	uint32_t newVoltageUnder = 0;
+	uint32_t newVoltageOver  = 0;
 	driverSWLTC6804StatusStructTypedef driverSWLTC6804StatusStruct[driverSWLTC6804TotalNumberOfICs];
 	
 	// Get the data from the modules
@@ -278,8 +278,18 @@ bool driverSWLTC6804ReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *over
 	
 	// Combine it
 	for(uint8_t modulePointer = 0; modulePointer < driverSWLTC6804TotalNumberOfICs; modulePointer++) {
-		newVoltageUnder |= driverSWLTC6804StatusStruct[modulePointer].underVoltage;
-		newVoltageOver  |= driverSWLTC6804StatusStruct[modulePointer].overVoltage;
+		
+		//if we have a different number of cells monitored in the last IC, disable error bits with mask
+		if((modulePointer+1) % (driverSWLTC6804TotalNumberOfICs/noOfParallelModules)   == 0 && modulePointer != 0){
+					driverSWLTC6804StatusStruct[modulePointer].underVoltage &= lastICMask;
+					driverSWLTC6804StatusStruct[modulePointer].overVoltage &= lastICMask;
+			
+					newVoltageUnder |= driverSWLTC6804StatusStruct[modulePointer].underVoltage;
+					newVoltageOver  |= driverSWLTC6804StatusStruct[modulePointer].overVoltage;
+			}else{		
+				newVoltageUnder |= driverSWLTC6804StatusStruct[modulePointer].underVoltage;
+				newVoltageOver  |= driverSWLTC6804StatusStruct[modulePointer].overVoltage;
+			}
 	}
 	
 	// Transfer the data to the output
@@ -349,6 +359,30 @@ uint8_t driverSWLTC6804ReadStatusValues(uint8_t total_ic, driverSWLTC6804StatusS
 		data_pec = driverSWLTC6804CalcPEC15(BYT_IN_REG, &status_data[current_ic * NUM_RX_BYT]);
 		if(received_pec != data_pec) {
 			pec_error = -1;															                                     //The pec_error variable is simply set negative if any PEC errors are detected in the serial data
+		}
+	}
+	
+	// Execute for higher cell count with auxiliary group D OV & UV flags
+	if(driverSWLTC6804MaxNoOfCellPerModule > 12){
+		
+		driverSWLTC6804ReadStatusGroups(3,total_ic,status_data);	
+		data_counter = 0;
+	
+		for (uint8_t current_ic = 0 ; current_ic < total_ic; current_ic++) {
+		
+			//Extract DATA for under & over voltage flags STBR4, STBR3, & STBR2
+			registersCombined  = (status_data[data_counter+5] << 8) | (status_data[data_counter+4]);	// Combine all registers in one variable
+			registersCombinedTemp = registersCombined & 0x00000555;																		// Filter out only the undervoltage bits
+		
+			for(int bitPointer = 0; bitPointer < (driverSWLTC6804ConfigStruct.noOfCells-12); bitPointer++){
+				statusArray[current_ic].underVoltage |= (((registersCombinedTemp & (1 << bitPointer*2)) ? (1 << bitPointer) : 0) << 12)	;		// Shift undervoltage bits closer together and store them in *underVoltageFlags + shift 12
+				
+			registersCombinedTemp = registersCombined & 0x00000AAA;																							// Filter out only the overvoltage bits
+			registersCombinedTemp = registersCombinedTemp >> 1;																									// Move everything one bit to the right
+
+			for(int bitPointer = 0; bitPointer < driverSWLTC6804ConfigStruct.noOfCells-12; bitPointer++)
+				statusArray[current_ic].overVoltage |= (((registersCombinedTemp & (1 << bitPointer*2)) ? (1 << bitPointer) : 0) << 12);				// And do the same for the overvoltage bits
+			}
 		}
 	}
 	
@@ -626,7 +660,7 @@ float driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNomin
   steinhart = scalar / (float)ntcNominal;               // (R/Ro)
   steinhart = log(steinhart);                           // ln(R/Ro)
   steinhart /= (float)ntcBetaFactor;                    // 1/B * ln(R/Ro)
-  steinhart += 1.0f / (ntcNominalTemp + 273.15f);       // + (1/To)
+  steinhart += 1.0f / ((float)ntcNominalTemp + 273.15f);       // + (1/To)
   steinhart = 1.0f / steinhart;                         // Invert
   steinhart -= 273.15f;                                 // convert to degree
 	

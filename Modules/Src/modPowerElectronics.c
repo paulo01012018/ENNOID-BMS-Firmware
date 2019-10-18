@@ -32,7 +32,7 @@ uint32_t chargeIncreaseIntervalTime;
 
 uint16_t  calculatedChargeThrottle = 0;
 
-uint16_t hardUnderVoltageFlags, hardOverVoltageFlags;
+uint32_t hardUnderVoltageFlags, hardOverVoltageFlags;
 
 void modPowerElectronicsInit(modPowerElectronicsPackStateTypedef *packState, modConfigGeneralConfigStructTypedef *generalConfigPointer) {
 	modPowerElectronicsGeneralConfigHandle                       = generalConfigPointer;
@@ -167,9 +167,6 @@ bool modPowerElectronicsTask(void) {
 		// get STM32 ADC NTC temp
 		driverHWADCGetNTCValue(&modPowerElectronicsPackStateHandle->temperatures[3],modPowerElectronicsGeneralConfigHandle->NTC25DegResistance[modConfigNTCGroupMasterPCB],modPowerElectronicsGeneralConfigHandle->NTCTopResistor[modConfigNTCGroupMasterPCB],modPowerElectronicsGeneralConfigHandle->NTCBetaFactor[modConfigNTCGroupMasterPCB],25.0f);
 		
-		// Calculate temperature statisticks
-		modPowerElectronicsCalcTempStats();
-		
 		// When temperature and cellvoltages are known calculate charge and discharge throttle.
 		modPowerElectronicsCalcThrottle();
 		
@@ -187,6 +184,9 @@ bool modPowerElectronicsTask(void) {
 		
 		// Check and respond to the measured voltage values
 		modPowerElectronicsSubTaskVoltageWatch();
+		
+		// Calculate temperature statisticks
+		modPowerElectronicsCalcTempStats();
 		
 		// Check and respond to the measured current values
 		modPowerElectronicsSubTaskCurrentWatch();
@@ -332,7 +332,6 @@ void modPowerElectronicsSubTaskBalancing(void) {
 			
 			//temp remove true
 			if((modPowerElectronicsPackStateHandle->chargeDesired && !modPowerElectronicsPackStateHandle->disChargeDesired) || modPowerElectronicsPackStateHandle->chargeBalanceActive || true) {																							// Check if charging is desired. Removed: || !modPowerElectronicsPackStateHandle->chargeAllowed
-				// Old for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->maxSimultaneousDischargingCells; i++) {
 				for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
 					if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellVoltage >= (modPowerElectronicsPackStateHandle->cellVoltageLow + modPowerElectronicsGeneralConfigHandle->cellBalanceDifferenceThreshold)) {
 						if(modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellVoltage >= modPowerElectronicsGeneralConfigHandle->cellBalanceStart) {
@@ -345,7 +344,7 @@ void modPowerElectronicsSubTaskBalancing(void) {
 					}
 				}
 			}
-//		}
+
 		
 		//modPowerElectronicsPackStateHandle->cellBalanceResistorEnableMask = cellBalanceMaskEnableRegister;
 		
@@ -1160,7 +1159,7 @@ void modPowerElectronicsCellMonitorsEnableBalanceResistorsArray(){
 	}
 }
 
-void modPowerElectronicsCellMonitorsReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags){
+void modPowerElectronicsCellMonitorsReadVoltageFlags(uint32_t *underVoltageFlags, uint32_t *overVoltageFlags){
 	modPowerElectronicsCellMonitorsCheckAndSolveInitState();
 	
 	switch(modPowerElectronicsGeneralConfigHandle->cellMonitorType){
@@ -1171,7 +1170,7 @@ void modPowerElectronicsCellMonitorsReadVoltageFlags(uint16_t *underVoltageFlags
 		case CELL_MON_LTC6811_1:
 		case CELL_MON_LTC6812_1:
 		case CELL_MON_LTC6813_1:{
-			driverSWLTC6804ReadVoltageFlags(underVoltageFlags,overVoltageFlags);
+			driverSWLTC6804ReadVoltageFlags(underVoltageFlags,overVoltageFlags, modPowerElectronicsGeneralConfigHandle->lastICMask, modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
 		}break;
 		default:
 			break;

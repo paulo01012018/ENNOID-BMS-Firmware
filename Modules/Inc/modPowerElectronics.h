@@ -175,7 +175,7 @@ void  modPowerElectronicsCellMonitorsStartLoadedCellConversion(bool PUP);
 void  modPowerElectronicsCellMonitorsStartTemperatureConversion(void);
 void  modPowerElectronicsCellMonitorsEnableBalanceResistors(uint16_t);
 void  modPowerElectronicsCellMonitorsEnableBalanceResistorsArray(void);
-void  modPowerElectronicsCellMonitorsReadVoltageFlags(uint16_t *underVoltageFlags, uint16_t *overVoltageFlags);
+void  modPowerElectronicsCellMonitorsReadVoltageFlags(uint32_t *underVoltageFlags, uint32_t *overVoltageFlags);
 void  modPowerElectronicsCellMonitorsCheckAndSolveInitState(void);
 void  modPowerElectronicsCellMonitorsArrayTranslate(void);
 void  modPowerElectronicsAuxMonitorsArrayTranslate(void);
