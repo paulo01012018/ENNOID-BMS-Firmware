@@ -375,7 +375,7 @@ uint8_t driverSWLTC6804ReadStatusValues(uint8_t total_ic, driverSWLTC6804StatusS
 			registersCombinedTemp = registersCombined & 0x00000555;																		// Filter out only the undervoltage bits
 		
 			for(int bitPointer = 0; bitPointer < (driverSWLTC6804ConfigStruct.noOfCells-12); bitPointer++){
-				statusArray[current_ic].underVoltage |= (((registersCombinedTemp & (1 << bitPointer*2)) ? (1 << bitPointer) : 0) << 12)	;		// Shift undervoltage bits closer together and store them in *underVoltageFlags + shift 12
+				statusArray[current_ic].underVoltage |= (((registersCombinedTemp & (1 << bitPointer*2)) ? (1 << bitPointer) : 0) << 12)	;		// Shift undervoltage bits closer together and store them in *underVoltageFlags + shift 12 bits
 				
 			registersCombinedTemp = registersCombined & 0x00000AAA;																							// Filter out only the overvoltage bits
 			registersCombinedTemp = registersCombinedTemp >> 1;																									// Move everything one bit to the right
@@ -665,7 +665,7 @@ float driverSWLTC6804ConvertTemperatureExt(uint16_t inputValue,uint32_t ntcNomin
   steinhart -= 273.15f;                                 // convert to degree
 	
 	if(steinhart < -50.0f || (float)inputValue >= 30000.0f)
-		steinhart = 0.0f;
+		steinhart = 100.0f;
 	
   return steinhart;
 }

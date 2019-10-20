@@ -10,9 +10,9 @@
 #define ENNOID
 
 // Firmware version
-#define FW_VERSION_MAJOR		0
-#define FW_VERSION_MINOR		32
-#define FW_REAL_VERSION			"V0.32"
+#define FW_VERSION_MAJOR		1
+#define FW_VERSION_MINOR		0
+#define FW_REAL_VERSION			"V1.0"
 
 // UUID
 #define STM32_UUID					((uint32_t*)0x1FFFF7AC)
