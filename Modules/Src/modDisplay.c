@@ -38,10 +38,10 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 				libGraphicsSetCursor(10,SSD1306_LCDHEIGHT/2+14);
 
 				libGraphicsWrite('V');
-				libGraphicsWrite('0');
+				libGraphicsWrite('1');
 				libGraphicsWrite('.');
-				libGraphicsWrite('3');
-				libGraphicsWrite('2');
+				libGraphicsWrite('0');
+				libGraphicsWrite('0');
 				break;
 			case DISP_MODE_LOAD:
 				driverSWSSD1306ClearDisplay();
@@ -93,7 +93,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						
 			//Display Max battery temperature
 					libGraphicsSetTextSize(1);
-					libGraphicsSetCursor(75,27);
+					libGraphicsSetCursor(70,27);
 					libGraphicsWrite('T');
 					libGraphicsWrite('m');
 					libGraphicsWrite('a');
@@ -109,7 +109,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						libGraphicsWrite('C');
 						
 			//Display Avg battery temperature
-					libGraphicsSetCursor(75,37);
+					libGraphicsSetCursor(70,37);
 					libGraphicsWrite('T');
 					libGraphicsWrite('a');
 					libGraphicsWrite('v');
@@ -124,7 +124,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.AverageTemp));
 						libGraphicsWrite('C');
 				//Display low battery temperature
-					libGraphicsSetCursor(75,47);
+					libGraphicsSetCursor(70,47);
 					libGraphicsWrite('T');
 					libGraphicsWrite('l');
 					libGraphicsWrite('o');

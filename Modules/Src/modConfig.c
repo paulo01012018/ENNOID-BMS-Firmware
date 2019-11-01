@@ -38,6 +38,7 @@ bool modConfigStoreDefaultConfig(void) {
 void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLocation) {
 	configLocation->maxSimultaneousDischargingCells = MIN(configLocation->maxSimultaneousDischargingCells,HW_LIM_CELL_BALANCE_MAX_SIMULTANEOUS_DISCHARGE);
 	configLocation->cellMonitorICCount              = MIN(configLocation->cellMonitorICCount             ,HW_LIM_CELL_MONITOR_IC_COUNT);
+	configLocation->lastICMask 											= 0;
 	
 	if(configLocation->notUsedTimeout)
 		configLocation->notUsedTimeout                = MAX(configLocation->notUsedTimeout                 ,HW_LIM_MIN_NOT_USED_DELAY);
@@ -46,13 +47,18 @@ void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLoc
 	if((configLocation->cellMonitorICCount % configLocation->noOfParallelModules) == 0){ // Check if feasable configuration
 			if(configLocation->noOfCellsSeries % (configLocation->cellMonitorICCount / configLocation->noOfParallelModules) == 0){
 				configLocation->noOfCellsPerModule = configLocation->noOfCellsSeries/(configLocation->cellMonitorICCount / configLocation->noOfParallelModules);
+				configLocation->lastICNoOfCells = configLocation->noOfCellsPerModule;
+				
+				for(int bitPointer = 0; bitPointer < configLocation->lastICNoOfCells ; bitPointer++){
+					configLocation->lastICMask = (configLocation->lastICMask << 1)| 1 ; // This contains the last cells mask  used for enabling UV & OV flag in the last serie IC 
+				}
 			}else{ //Odd number of cells in series
-				configLocation->noOfCellsPerModule = (configLocation->noOfCellsSeries /(configLocation->cellMonitorICCount / configLocation->noOfParallelModules))+1;
+				configLocation->noOfCellsPerModule = (configLocation->noOfCellsSeries / (configLocation->cellMonitorICCount / configLocation->noOfParallelModules))+1;
 				
 				configLocation->lastICNoOfCells = configLocation->noOfCellsSeries % configLocation->noOfCellsPerModule; // This contains the last cells number monitored by the last serie IC 
 				
 				for(int bitPointer = 0; bitPointer < configLocation->lastICNoOfCells ; bitPointer++){
-					configLocation->lastICMask = (configLocation->lastICMask << 1)| 1 ; // This contains the last cells mask  used for disabling UV & OV flag in the last serie IC 
+					configLocation->lastICMask = (configLocation->lastICMask << 1)| 1 ; // This contains the last cells mask  used for enabling UV & OV flag in the last serie IC 
 				}	
 			};			
 		}else{
@@ -74,9 +80,9 @@ void modconfigHardwareLimitsApply(modConfigGeneralConfigStructTypedef *configLoc
 
 void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocation) {
 	#ifdef ENNOID
-	configLocation->noOfCellsSeries														     = 12;											// Total number of cells in series in the battery pack
+	configLocation->noOfCellsSeries														     = 15;											// Total number of cells in series in the battery pack
 	configLocation->noOfCellsParallel                              = 10;                      // Number of cells in parallel
-	configLocation->noOfCellsPerModule                             = 12;                      // Number of cell levels monitored per LTC68XX
+	configLocation->noOfCellsPerModule                             = 15;                      // Number of cell levels monitored per LTC68XX
 	configLocation->noOfParallelModules                       	   = 1;                     	// Number of parallel modules
 	configLocation->batteryCapacity														     = 22.00f;									// XXAh battery
 	configLocation->cellHardUnderVoltage											     = 2.30f;										// Worst case X.XXV as lowest cell voltage
@@ -95,13 +101,13 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->buzzerSignalSource                             = buzzerSourceOff;         // Stores what source shoud be taken to trigger
 	configLocation->buzzerSignalType                               = buzzerSignalTypeOn;      // Stores what sound pattern should be made
 	configLocation->buzzerSingalPersistant                         = true;                    // Stores whether the buzzer should stay on after triggering
-  configLocation->shuntLCFactor                                  = -0.025f;              		// Shunt factor low current
+  configLocation->shuntLCFactor                                  = -0.0172f;              		// Shunt factor low current
 	configLocation->shuntLCOffset                                  = 28;                      // Shunt offset low current
   configLocation->shuntHCFactor	                                 = 0.001f;                  // Shunt factor high current
 	configLocation->shuntHCOffset                                  = -4;                      // Shunt offset high current
 	configLocation->voltageLCFactor	                               = 49.0f;                   // Voltage factor low current
 	configLocation->voltageLCOffset                                = 0;                       // Voltage offset low current
-	configLocation->loadVoltageFactor	                             = 259.0f;                  // Voltage factor low current
+	configLocation->loadVoltageFactor	                             = 234.0f;                  // Voltage factor low current
 	configLocation->loadVoltageOffset                              = 0.0f;                    // Voltage offset low current
 	configLocation->throttleChargeIncreaseRate                     = 1;                       // Percentage charge throttle increase rate per 100ms (cell voltage loop time)  
 	configLocation->throttleDisChargeIncreaseRate                  = 2;                       // Percentage discharge throttle increase rate per 100ms (cell voltage loop time)  	
@@ -116,7 +122,7 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->maxMismatchThreshold											     = 0.020f;									// If mismatch is under this threshold for timeoutChargingCompletedMinimalMismatch determin fully charged.
 	configLocation->chargerEnabledThreshold										     = 0.5f;										// If charge current > X.XA stay in charging mode and dont power off.
 	configLocation->timeoutChargerDisconnected								     = 2000;										// Wait for X seconds to respond to charger disconnect.
-	configLocation->minimalPrechargePercentage								     = 0.80f;										// output should be at a minimal of 80% of input voltage.
+	configLocation->minimalPrechargePercentage								     = 0.60f;										// output should be at a minimal of 80% of input voltage.
 	configLocation->timeoutLCPreCharge												     = 3000;											// Precharge error timeout, allow 300ms pre-charge time before declaring load error.
 	configLocation->maxAllowedCurrent													     = 120.0f;									// Allow max XXXA trough BMS.
 	configLocation->allowedTempBattDischargingMax                  = 75.0f;                   // Max battery temperature where discharging is still allowed
@@ -149,15 +155,15 @@ void modConfigLoadDefaultConfig(modConfigGeneralConfigStructTypedef *configLocat
 	configLocation->NTCTopResistor[modConfigNTCGroupMasterPCB]     = 100000;                  // NTC Pullup resistor value
 	configLocation->NTC25DegResistance[modConfigNTCGroupLTCExt]    = 100000;                  // NTC resistance at 25 degree
 	configLocation->NTC25DegResistance[modConfigNTCGroupMasterPCB] = 100000;                  // NTC resistance at 25 degree
-	configLocation->NTCBetaFactor[modConfigNTCGroupLTCExt]         = 3590;                    // NTC Beta factor
-	configLocation->NTCBetaFactor[modConfigNTCGroupMasterPCB]      = 3590;                    // NTC Beta factor
+	configLocation->NTCBetaFactor[modConfigNTCGroupLTCExt]         = 4250;                    // NTC Beta factor
+	configLocation->NTCBetaFactor[modConfigNTCGroupMasterPCB]      = 4250;                    // NTC Beta factor
 	configLocation->allowChargingDuringDischarge                   = true;                    // Allow the battery to be charged in normal mode
 	configLocation->allowForceOn                                   = false;                   // Allow the BMS to be forced ON by long actuation of the power button
 	configLocation->pulseToggleButton                              = true;                    // Select either pulse or toggle power button
 	configLocation->togglePowerModeDirectHCDelay                   = true;                    // Select either direct power state control or HC output control with delayed turn off.
 	configLocation->useCANSafetyInput                              = false;                   // Use the safety input status from CAN
 	configLocation->useCANDelayedPowerDown                         = false;                   // Use delayed power down
-	configLocation->cellMonitorType                                = CELL_MON_LTC6804_1;      // Use the new cell voltage monitor
+	configLocation->cellMonitorType                                = CELL_MON_LTC6812_1;      // Use the new cell voltage monitor
 	configLocation->cellMonitorICCount                             = 1;                       // Only one slave IC
 	configLocation->lastICNoOfCells																 = 0;
 	configLocation->lastICMask																		 = 0;

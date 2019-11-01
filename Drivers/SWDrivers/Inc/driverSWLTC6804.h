@@ -194,6 +194,7 @@ int8_t   driverSWLTC6804ReadConfigRegister(uint8_t nIC, uint8_t r_config[][8]);
 void     driverSWLTC6804ResetCellVoltageRegisters(void);
 void     driverSWLTC6804ResetAuxRegisters(void);
 void     driverSWLTC6804ResetStatusRegisters(void);
+
 void     driverSWLTC6804StartCellAndAuxVoltageConversion(uint8_t MD,uint8_t DCP);
 void     driverSWLTC6804StartCellVoltageConversion(uint8_t MD,uint8_t DCP, uint8_t CH);
 void     driverSWLTC6804StartLoadedCellVoltageConversion(uint8_t MD,uint8_t DCP, uint8_t CH,uint8_t PUP);

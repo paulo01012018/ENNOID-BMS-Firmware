@@ -265,7 +265,7 @@ bool modPowerElectronicsSetDisCharge(bool newState) {
 		dischargeLastState = newState;
 	}
 	
-	if((modPowerElectronicsPackStateHandle->loCurrentLoadVoltage < PRECHARGE_PERCENTAGE*(modPowerElectronicsPackStateHandle->packVoltage)) && modPowerElectronicsGeneralConfigHandle->LCUsePrecharge>=1) // Prevent turn on with to low output voltage
+	if((modPowerElectronicsPackStateHandle->loCurrentLoadVoltage < modPowerElectronicsGeneralConfigHandle->minimalPrechargePercentage*(modPowerElectronicsPackStateHandle->packVoltage)) && modPowerElectronicsGeneralConfigHandle->LCUsePrecharge>=1) // Prevent turn on with to low output voltage
 		return false;																																			                                                  // Load voltage to low (output not precharged enough) return whether or not precharge is needed.
 	else
 		return true;
@@ -309,7 +309,7 @@ void modPowerElectronicsCalculateCellStats(void) {
 			modPowerElectronicsPackStateHandle->cellVoltageLow = modPowerElectronicsPackStateHandle->cellVoltagesIndividual[cellPointer].cellVoltage;		
 	}
 	
-	modPowerElectronicsPackStateHandle->cellVoltageAverage = cellVoltagesSummed/modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules;
+	modPowerElectronicsPackStateHandle->cellVoltageAverage = cellVoltagesSummed/(modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules);
 	modPowerElectronicsPackStateHandle->cellVoltageMisMatch = modPowerElectronicsPackStateHandle->cellVoltageHigh - modPowerElectronicsPackStateHandle->cellVoltageLow;
 };
 
@@ -946,7 +946,7 @@ void modPowerElectronicsCellMonitorsInit(void){
 			configStruct.DischargeTimout          = 0;																															// Discharge timout value / limit
 			configStruct.CellUnderVoltageLimit    = modPowerElectronicsGeneralConfigHandle->cellHardUnderVoltage; 	// Undervoltage level, cell voltages under this limit will cause interrupt
 			configStruct.CellOverVoltageLimit     = modPowerElectronicsGeneralConfigHandle->cellHardOverVoltage;  	// Over voltage limit, cell voltages over this limit will cause interrupt
-			driverSWLTC6804Init(configStruct,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,15, 12);  	 // Config for the LTC6812
+			driverSWLTC6804Init(configStruct,modPowerElectronicsGeneralConfigHandle->cellMonitorICCount,18, 12);  	 // Config for the LTC6812
 			
 			// Safety signal is managed by the controller, it is configured as open drain and will be kept low by. watchdog will make the output to be released.
 			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_RESET);
@@ -1069,7 +1069,7 @@ void modPowerElectronicsCellMonitorsStartCellConversion(void) {
 		case CELL_MON_LTC6811_1:
 		case CELL_MON_LTC6812_1:
 		case CELL_MON_LTC6813_1:{
-			driverSWLTC6804StartCellAndAuxVoltageConversion(MD_FILTERED,DCP_DISABLED);
+			driverSWLTC6804StartCellAndAuxVoltageConversion(MD_FILTERED,DCP_ENABLED);
 			driverSWLTC6804ResetCellVoltageRegisters();
 		}break;
 		default:
@@ -1093,7 +1093,7 @@ void modPowerElectronicsCellMonitorsStartLoadedCellConversion(bool PUP) {
 		case CELL_MON_LTC6811_1:
 		case CELL_MON_LTC6812_1:
 		case CELL_MON_LTC6813_1:{
-		  driverSWLTC6804StartLoadedCellVoltageConversion(MD_FILTERED,DCP_DISABLED,CELL_CH_ALL,PUP);
+		  driverSWLTC6804StartLoadedCellVoltageConversion(MD_FILTERED,DCP_ENABLED,CELL_CH_ALL,PUP);
 			driverSWLTC6804ResetCellVoltageRegisters();
 		}break;
 		default:
@@ -1347,7 +1347,7 @@ void modPowerElectronicsSamplePackAndLCData(void) {
 	
 	modPowerElectronicsSamplePackVoltage(&tempPackVoltage);
 	
-	if(fabs(tempPackVoltage - modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsPackStateHandle->cellVoltageAverage) < 2.0f) {    // If the error is smaller than one volt continue normal operation. 
+	if(fabs(tempPackVoltage - modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsPackStateHandle->cellVoltageAverage) < 10.0f) {    // If the error is smaller than one 10 volts continue normal operation. 
 		modPowerElectronicsPackStateHandle->packVoltage = tempPackVoltage;
 		modPowerElectronicsLCSenseSample();
 		modPowerElectronicsVinErrorCount = 0;																								// Reset error count.
