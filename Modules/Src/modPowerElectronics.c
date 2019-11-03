@@ -315,21 +315,14 @@ void modPowerElectronicsCalculateCellStats(void) {
 
 void modPowerElectronicsSubTaskBalancing(void) {
 	static uint32_t delayTimeHolder = 100;
-//	static bool     delaytoggle = false;
-//	cellMonitorCellsTypeDef sortedCellArray[modPowerElectronicsGeneralConfigHandle->noOfCellsSeries];
+	static bool     delaytoggle = false;
+	
 	
 	if(modDelayTick1ms(&modPowerElectronicsCellBalanceUpdateLastTick,delayTimeHolder)) {
-//		delaytoggle ^= true;
-//		delayTimeHolder = delaytoggle ? modPowerElectronicsGeneralConfigHandle->cellBalanceUpdateInterval : 200;
+		delaytoggle ^= true;
+		delayTimeHolder = delaytoggle ? modPowerElectronicsGeneralConfigHandle->cellBalanceUpdateInterval : 200;
 		
-//		if(delaytoggle) {
-//			for(int k=0; k < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries; k++) {
-//				sortedCellArray[k] = modPowerElectronicsPackStateHandle->cellVoltagesIndividual[k];	// This will contain the voltages that are unloaded by balance resistors
-//			}
-				
-//			modPowerElectronicsSortCells(sortedCellArray,modPowerElectronicsGeneralConfigHandle->noOfCellsSeries);
-			
-			
+		if(delaytoggle) {
 			//temp remove true
 			if((modPowerElectronicsPackStateHandle->chargeDesired && !modPowerElectronicsPackStateHandle->disChargeDesired) || modPowerElectronicsPackStateHandle->chargeBalanceActive || true) {																							// Check if charging is desired. Removed: || !modPowerElectronicsPackStateHandle->chargeAllowed
 				for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
@@ -344,13 +337,11 @@ void modPowerElectronicsSubTaskBalancing(void) {
 					}
 				}
 			}
-
-		
-		//modPowerElectronicsPackStateHandle->cellBalanceResistorEnableMask = cellBalanceMaskEnableRegister;
-		
-		//if(lastCellBalanceRegister != cellBalanceMaskEnableRegister)
-		//	modPowerElectronicsCellMonitorsEnableBalanceResistors(cellBalanceMaskEnableRegister);
-		//lastCellBalanceRegister = cellBalanceMaskEnableRegister;
+		}//else{
+		//for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
+		//modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellBleedActive = false;
+		//}
+	//}
 		
 		modPowerElectronicsCallMonitorsCalcBalanceResistorArray();
 		modPowerElectronicsCellMonitorsEnableBalanceResistorsArray();

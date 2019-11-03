@@ -52,7 +52,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 					libGraphicsSetTextColor_0(WHITE);
 		
 			//Display state of charge
-					libGraphicsSetCursor(7,7);
+					libGraphicsSetCursor(0,7);
 					libGraphicsWrite('S');
 					libGraphicsWrite('O');
 					libGraphicsWrite('C');
@@ -68,9 +68,12 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 					libGraphicsWrite('%');
 					
 			//Display current
-					libGraphicsSetCursor(7,27);
+					libGraphicsSetCursor(0,27);
 					libGraphicsWrite('I');
 					libGraphicsWrite(':');
+					if(modDisplayData.Current <= 0.0f){
+							libGraphicsWrite('-');
+						}
 					if(modDisplay100ConvertIntegerToASCII(modDisplayData.Current)!= 48){
 							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.Current));
 						}
@@ -80,7 +83,7 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.Current));	
 						
 			//Display Battery Voltage
-					libGraphicsSetCursor(7,47);
+					libGraphicsSetCursor(0,47);
 					libGraphicsWrite('V');
 					libGraphicsWrite(':');
 					if(modDisplay100ConvertIntegerToASCII(modDisplayData.PackVoltage) !=48){
@@ -93,12 +96,15 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 						
 			//Display Max battery temperature
 					libGraphicsSetTextSize(1);
-					libGraphicsSetCursor(70,27);
+					libGraphicsSetCursor(74,27);
 					libGraphicsWrite('T');
 					libGraphicsWrite('m');
 					libGraphicsWrite('a');
 					libGraphicsWrite('x');
 					libGraphicsWrite(':');
+					if(modDisplayData.HighestTemp <= 0.0f){
+							libGraphicsWrite('-');
+						}
 					if(modDisplay100ConvertIntegerToASCII(modDisplayData.HighestTemp) !=48){
 							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.HighestTemp));	
 						}
@@ -106,15 +112,17 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.HighestTemp));
 						}							
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.HighestTemp));
-						libGraphicsWrite('C');
 						
 			//Display Avg battery temperature
-					libGraphicsSetCursor(70,37);
+					libGraphicsSetCursor(74,37);
 					libGraphicsWrite('T');
 					libGraphicsWrite('a');
 					libGraphicsWrite('v');
 					libGraphicsWrite('g');
 					libGraphicsWrite(':');
+					if(modDisplayData.AverageTemp <= 0.0f){
+							libGraphicsWrite('-');
+						}						
 					if(modDisplay100ConvertIntegerToASCII(modDisplayData.AverageTemp) !=48){
 							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.AverageTemp));	
 						}
@@ -122,14 +130,17 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.AverageTemp));
 						}							
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.AverageTemp));
-						libGraphicsWrite('C');
+						
 				//Display low battery temperature
-					libGraphicsSetCursor(70,47);
+					libGraphicsSetCursor(74,47);
 					libGraphicsWrite('T');
-					libGraphicsWrite('l');
-					libGraphicsWrite('o');
-					libGraphicsWrite('w');
+					libGraphicsWrite('m');
+					libGraphicsWrite('i');
+					libGraphicsWrite('n');
 					libGraphicsWrite(':');
+					if(modDisplayData.LowestTemp <= 0.0f){
+							libGraphicsWrite('-');
+						}									
 					if(modDisplay100ConvertIntegerToASCII(modDisplayData.LowestTemp) !=48){
 							libGraphicsWrite(modDisplay100ConvertIntegerToASCII(modDisplayData.LowestTemp));	
 						}
@@ -137,7 +148,6 @@ void modDisplayShowInfo(modDisplayInfoType newState, modDisplayDataTypedef modDi
 							libGraphicsWrite(modDisplay10ConvertIntegerToASCII(modDisplayData.LowestTemp));
 						}							
 					libGraphicsWrite(modDisplay1ConvertIntegerToASCII(modDisplayData.LowestTemp));
-						libGraphicsWrite('C');
 				break;
 			case DISP_MODE_CHARGE:
 				driverSWSSD1306ClearDisplay();
