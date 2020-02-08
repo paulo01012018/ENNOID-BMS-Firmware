@@ -337,11 +337,11 @@ void modPowerElectronicsSubTaskBalancing(void) {
 					}
 				}
 			}
-		}//else{
-		//for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
-		//modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellBleedActive = false;
-		//}
-	//}
+		}else{
+		for(uint8_t i = 0; i < modPowerElectronicsGeneralConfigHandle->noOfCellsSeries*modPowerElectronicsGeneralConfigHandle->noOfParallelModules; i++) {
+		modPowerElectronicsPackStateHandle->cellVoltagesIndividual[i].cellBleedActive = false;
+		}
+	}
 		
 		modPowerElectronicsCallMonitorsCalcBalanceResistorArray();
 		modPowerElectronicsCellMonitorsEnableBalanceResistorsArray();
@@ -918,7 +918,7 @@ void modPowerElectronicsCellMonitorsInit(void){
 			configStruct.DischargeTimout          = 0;																											// Discharge timout value / limit
 			configStruct.CellUnderVoltageLimit    = modPowerElectronicsGeneralConfigHandle->cellHardUnderVoltage; // Undervoltage level, cell voltages under this limit will cause interrupt
 			configStruct.CellOverVoltageLimit     = modPowerElectronicsGeneralConfigHandle->cellHardOverVoltage;  // Over voltage limit, cell voltages over this limit will cause interrupt
-			driverSWLTC6804Init(configStruct, modPowerElectronicsGeneralConfigHandle->cellMonitorICCount, 12, 6);   // Config for the LTC6804/LTC6811
+			driverSWLTC6804Init(configStruct, modPowerElectronicsGeneralConfigHandle->cellMonitorICCount, 18, 12);   // Config for the LTC6804/LTC6811
 			
 			// Safety signal is managed by the controller, it is configured as open drain and will be kept low by. watchdog will make the output to be released.
 			driverHWSwitchesSetSwitchState(SWITCH_SAFETY_OUTPUT,SWITCH_RESET);
